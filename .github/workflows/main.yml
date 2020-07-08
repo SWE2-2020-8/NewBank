@@ -6,8 +6,8 @@ on:
       - "client/**"
       - "server/target/**"
       - "server/test/**"
-      - "Readme.md"
-      - "server/Readme.md"
+      - "README.md"
+      - "server/README.md"
       - ".gitignore"
 
 name: Linux_Container_Workflow
