@@ -12,4 +12,4 @@ To jump quickly to...
 
 Server is running in http://swe2-2020-8.southeastasia.azurecontainer.io
 
-Interact with `socat - TCP4:gabriel2020swe816.southeastasia.azurecontainer.io:80`
+Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
