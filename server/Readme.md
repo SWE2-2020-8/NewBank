@@ -1,5 +1,8 @@
 # Automation for NewBank server:
 
+
+
+
 ## Run locally
 
 I have created a dockerfile that builds a container to create the jar, then copies the jar to a new container and then has an entry point for the bank server
@@ -11,6 +14,9 @@ I have created a dockerfile that builds a container to create the jar, then copi
 * And to make it run:
 
 `docker run -d -p 8080:14002 gabrielbcn/newbankserver:1.0`
+
+
+
 
 ## Run in the cloud (Azure)
 
@@ -191,7 +197,8 @@ jobs:
           uses: 'azure/aci-deploy@v1'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+            # dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+            dns-name-label: ${{ github.repository_owner }}
             image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
@@ -210,10 +217,15 @@ FQDN                                               ProvisioningState
 gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 ```
 
-`echo "SHOWMYACCOUNTS\n" | socat - TCP4:gabriel2020swe814.southeastasia.azurecontainer.io:80`
+* Interact with `socat - TCP4:gabriel2020swe815.southeastasia.azurecontainer.io:80`
+  
 
 
-## My first approach
+
+
+
+
+## My first approach, pushing the container to dockerhub
 
 Been creating the container and uploading to dockerhub with the secrets:
 
