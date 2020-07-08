@@ -1,6 +1,6 @@
-# This is a basic workflow to help you get started with Actions
+# Creating a bank server container
 
-name: CI
+name: CreateBankServerContainer
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -10,37 +10,25 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# Different jobs for a workflow
 jobs:
-  # This workflow contains a single job called "build"
+  # We only define build for now
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps that will be done
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@master
 
-    # Creating the container
-   # - name: Creating the container
-    #  run: |
-     #   cd server
-      #  echo "Building the container in two stages"
-       # docker build -t gabrielbcn/newbankserver:1.0 .
-        
-     # Showing the outcome
- #   - name: Storing the image
-  #    run: |
-   #     echo "Listing images"
-    #    docker images
-        
-    # Pushing to dockerhub    
-    - name: Publish container to registry
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: gabrielbcn/newbankserver:1.0
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        workdir: server
-    
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@master
+          
+      # Pushing to dockerhub    
+      - name: Publish container to registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: gabrielbcn/newbankserver:1.0
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          workdir: server
+
+      # Build is done, container is in place
