@@ -15,6 +15,7 @@ I have created a dockerfile that builds a container to create the jar, then copi
 
 `docker run -d -p 8080:14002 gabrielbcn/newbankserver:1.0`
 
+Obviously tags are flexible, here I was using my dockerhub account...
 
 
 
@@ -294,6 +295,7 @@ gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 ```
 
 
+
 ## My first approach, pushing the container to dockerhub
 
 Been creating the container and uploading to dockerhub with the secrets:
@@ -339,3 +341,5 @@ jobs:
 
       # Build is done, container is in place
 ```
+
+It works, but I ended up using the Azure container repo
