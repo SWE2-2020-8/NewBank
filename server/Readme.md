@@ -216,12 +216,82 @@ FQDN                                               ProvisioningState
 gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 ```
 
-* Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
+* Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80` **DONE**
   
 * Or with the browser at http://swe2-2020-8.southeastasia.azurecontainer.io
 
+* In order to check the status of the ACIs
 
+➜  server git:(master) `az container list`
 
+```json
+
+[
+  {
+    "containers": [
+      {
+        "command": [],
+        "environmentVariables": [],
+        "image": "crgabriel2020swe.azurecr.io/bankserver:8ea7156a0ff02667ad8e27536b232568f2935d23",
+        "instanceView": null,
+        "livenessProbe": null,
+        "name": "bankserver",
+        "ports": [
+          {
+            "port": 80,
+            "protocol": "TCP"
+          }
+        ],
+        "readinessProbe": null,
+        "resources": {
+          "limits": null,
+          "requests": {
+            "cpu": 1.0,
+            "gpu": null,
+            "memoryInGb": 1.5
+          }
+        },
+        "volumeMounts": null
+      }
+    ],
+    "diagnostics": null,
+    "dnsConfig": null,
+    "id": "/subscriptions/c4c4991b-008d-40f4-ab0e-52bdf0dfbf9c/resourceGroups/gabriel2020swe8/providers/Microsoft.ContainerInstance/containerGroups/bankserver",
+    "identity": null,
+    "imageRegistryCredentials": [
+      {
+        "password": null,
+        "server": "crgabriel2020swe.azurecr.io",
+        "username": "87bad605-1473-438b-bf15-bbcce373e24f"
+      }
+    ],
+    "instanceView": null,
+    "ipAddress": {
+      "dnsNameLabel": "SWE2-2020-8",
+      "fqdn": "SWE2-2020-8.southeastasia.azurecontainer.io",
+      "ip": "20.44.209.147",
+      "ports": [
+        {
+          "port": 80,
+          "protocol": "TCP"
+        }
+      ],
+      "type": "Public"
+    },
+    "location": "southeastasia",
+    "name": "bankserver",
+    "networkProfile": null,
+    "osType": "Linux",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "gabriel2020swe8",
+    "restartPolicy": "Always",
+    "tags": null,
+    "type": "Microsoft.ContainerInstance/containerGroups",
+    "volumes": null
+  }
+]
+
+```
 
 
 ## My first approach, pushing the container to dockerhub
