@@ -20,7 +20,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
 
     # Creating the container
     - name: Creating the container
@@ -34,7 +34,11 @@ jobs:
       run: |
         echo "Listing images"
         docker images
-        echo "Running the container"
-        docker run -it -p 8080:14002 gabrielbcn/newbankserver:1.0
-        echo "Actions done"
         
+    # Pushing to dockerhub    
+    - name: Publish container to registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: gabrielbcn/newbankserver:1.0
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
