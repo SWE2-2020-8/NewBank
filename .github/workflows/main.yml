@@ -25,6 +25,8 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Run a multi-line script
       run: |
-        ls
         cd server
         ls
+        docker build -t gabrielbcn/newbankserver:1.0 .
+        docker run -d -p 8080:14002 gabrielbcn/newbankserver:1.0
+        
