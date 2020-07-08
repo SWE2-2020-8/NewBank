@@ -3,7 +3,7 @@
 
 
 
-## Run locally
+## Build and run the server locally
 
 I have created a dockerfile that builds a container to create the jar, then copies the jar to a new container and then has an entry point for the bank server
 
@@ -13,9 +13,15 @@ I have created a dockerfile that builds a container to create the jar, then copi
 
 * And to make it run:
 
-`docker run -d -p 8080:14002 gabrielbcn/newbankserver:1.0`
+`docker run -d -p 80:80 gabrielbcn/newbankserver:1.0`
 
 Obviously tags are flexible, here I was using my dockerhub account...
+
+Also I have changed the port 80 to make it easier using the HTTP port...
+
+* To interact with the container:
+
+`socat - TCP4:localhost:80`
 
 
 
