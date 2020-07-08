@@ -200,6 +200,17 @@ jobs:
             location: 'southeastasia'
 ```
 
+* And if it all goes well:
+
+➜  NewBank git:(master) `az container show --resource-group gabriel2020swe8 --name bankserver --query "{FQDN:ipAddress.fqdn,ProvisioningState:provisioningState}" --output table`
+
+```
+FQDN                                               ProvisioningState
+-------------------------------------------------  -------------------
+gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
+```
+
+`echo "SHOWMYACCOUNTS\n" | socat - TCP4:gabriel2020swe814.southeastasia.azurecontainer.io:80`
 
 
 ## My first approach
