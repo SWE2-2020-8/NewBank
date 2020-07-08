@@ -22,11 +22,17 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Runs a set of commands using the runners shell
+    # Compile the server in a container
     - name: Run a multi-line script
       run: |
         cd server
+        echo "Listing the contents of the server folder"
         ls
+        echo "Building the container in two stages"
         docker build -t gabrielbcn/newbankserver:1.0 .
+        echo "Listing images"
+        docker images
+        echo "Running the container"
         docker run -d -p 8080:14002 gabrielbcn/newbankserver:1.0
+        echo "Actions done"
         
