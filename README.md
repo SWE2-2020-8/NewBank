@@ -10,3 +10,6 @@ To jump quickly to...
 - [Milestones](https://github.com/SWE2-2020-8/NewBank/milestones), to track weekly progress
 
 
+Server is running in http://swe2-2020-8.southeastasia.azurecontainer.io
+
+Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
