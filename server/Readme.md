@@ -197,7 +197,6 @@ jobs:
           uses: 'azure/aci-deploy@v1'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
-            # dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
             dns-name-label: ${{ github.repository_owner }}
             image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
@@ -217,9 +216,9 @@ FQDN                                               ProvisioningState
 gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 ```
 
-* Interact with `socat - TCP4:gabriel2020swe815.southeastasia.azurecontainer.io:80`
+* Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
   
-
+* Or with the browser at http://swe2-2020-8.southeastasia.azurecontainer.io
 
 
 
