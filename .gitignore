@@ -2,4 +2,5 @@
 client/.DS_Store
 server/.DS_Store
 server/target
-
+server/.settings
+.settings
