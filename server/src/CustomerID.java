@@ -1,12 +1,12 @@
 
 public class CustomerID {
-    private String key;
+	private String key;
 
-    public CustomerID(String key) {
-        this.key = key;
-    }
+	public CustomerID(String key) {
+		this.key = key;
+	}
 
-    public String getKey() {
-        return key;
-    }
+	public String getKey() {
+		return key;
+	}
 }
