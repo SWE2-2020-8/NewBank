@@ -273,7 +273,7 @@ Keys stored in secrets:
 
 ```yaml
 on: [push]
-name: Linux_Container_Workflow
+name: NewBankServer_to_Azure
 
 jobs:
     build-and-deploy:

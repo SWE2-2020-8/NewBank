@@ -10,7 +10,7 @@ on:
       - "server/README.md"
       - ".gitignore"
 
-name: Linux_Container_Workflow
+name: NewBankServer_to_Azure
 
 jobs:
   build-and-deploy:
