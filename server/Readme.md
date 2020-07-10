@@ -315,6 +315,8 @@ jobs:
             location: 'southeastasia'
 ```
 
+Note: **storage will be mounted to /mnt/volume**
+
 * And if it all goes well:
 
 ➜  NewBank git:(master) `az container show --resource-group gabriel2020swe8 --name bankserver --query "{FQDN:ipAddress.fqdn,ProvisioningState:provisioningState}" --output table`
