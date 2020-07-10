@@ -171,6 +171,104 @@ Creating a role assignment under the scope of "/subscriptions/c4c4991b-008d-40f4
 to check: `az provider show -n Microsoft.ContainerInstance`
 
 
+* Creating a storage account with a file share
+
+To keep proper defaults `az configure --defaults group=gabriel2020swe8 location=southeastasia`
+
+Now creating the storage account:
+➜  NewBank git:(master) `az storage account create --name gabriel2020swe8 --sku Standard_LRS`
+
+```json
+{- Finished ..
+  "accessTier": "Hot",
+  "azureFilesIdentityBasedAuthentication": null,
+  "blobRestoreStatus": null,
+  "creationTime": "2020-07-10T05:16:52.060482+00:00",
+  "customDomain": null,
+  "enableHttpsTrafficOnly": true,
+  "encryption": {
+    "keySource": "Microsoft.Storage",
+    "keyVaultProperties": null,
+    "requireInfrastructureEncryption": null,
+    "services": {
+      "blob": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-07-10T05:16:52.107363+00:00"
+      },
+      "file": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-07-10T05:16:52.107363+00:00"
+      },
+      "queue": null,
+      "table": null
+    }
+  },
+  "failoverInProgress": null,
+  "geoReplicationStats": null,
+  "id": "/subscriptions/c4c4991b-008d-40f4-ab0e-52bdf0dfbf9c/resourceGroups/gabriel2020swe8/providers/Microsoft.Storage/storageAccounts/gabriel2020swe8",
+  "identity": null,
+  "isHnsEnabled": null,
+  "kind": "StorageV2",
+  "largeFileSharesState": null,
+  "lastGeoFailoverTime": null,
+  "location": "southeastasia",
+  "name": "gabriel2020swe8",
+  "networkRuleSet": {
+    "bypass": "AzureServices",
+    "defaultAction": "Allow",
+    "ipRules": [],
+    "virtualNetworkRules": []
+  },
+  "primaryEndpoints": {
+    "blob": "https://gabriel2020swe8.blob.core.windows.net/",
+    "dfs": "https://gabriel2020swe8.dfs.core.windows.net/",
+    "file": "https://gabriel2020swe8.file.core.windows.net/",
+    "internetEndpoints": null,
+    "microsoftEndpoints": null,
+    "queue": "https://gabriel2020swe8.queue.core.windows.net/",
+    "table": "https://gabriel2020swe8.table.core.windows.net/",
+    "web": "https://gabriel2020swe8.z23.web.core.windows.net/"
+  },
+  "primaryLocation": "southeastasia",
+  "privateEndpointConnections": [],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "gabriel2020swe8",
+  "routingPreference": null,
+  "secondaryEndpoints": null,
+  "secondaryLocation": null,
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "statusOfPrimary": "available",
+  "statusOfSecondary": null,
+  "tags": {},
+  "type": "Microsoft.Storage/storageAccounts"
+}
+```
+
+And finally creating the file share:
+➜  NewBank git:(master) ✗ `az storage share create --name serverstorage  --account-name "gabriel2020swe8"`
+There is no credential provided in your command and environment, we will query account key for your storage account.
+Please provide --connection-string, --account-key or --sas-token as credential, or use `--auth-mode login` if you have required RBAC roles in your command. For more information about RBAC roles in stoarge, you can see https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-rbac-cli.
+Setting corresponding environment variable can avoid inputting credential in your command. Please use --help to get more information.
+```json
+{
+  "created": true
+}
+```
+
+And get the key:
+`az storage account keys list --resource-group gabriel2020swe8 --account-name gabriel2020swe8 --query "[0].value" --output tsv`
+
+Keys stored in secrets:
+`AZ_STORAGE_ACCOUNT_NAME`
+`AZ_STORAGE_ACCOUNT_KEY`
+`AZ_STORAGE_SHARE_NAME`
+
+
 * And finally the code: (NewBank/.github/workflows/main.yml)
 
 ```yaml
@@ -210,6 +308,10 @@ jobs:
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
             name: bankserver
+            azure-file-volume-share-name: ${{ AZ_STORAGE_SHARE_NAME }}
+            azure-file-volume-account-name: ${{ secrets.AZ_STORAGE_ACCOUNT_NAME }}
+            azure-file-volume-account-key: ${{ secrets.AZ_STORAGE_ACCOUNT_KEY }}
+            azure-file-volume-mount-path: /mnt/volume
             location: 'southeastasia'
 ```
 
@@ -299,6 +401,11 @@ gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 ]
 
 ```
+
+and another way to interact with them:
+
+`az container exec --container-name bankserver --exec-command sh --name bankserver`
+
 
 
 

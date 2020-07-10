@@ -46,4 +46,8 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: bankserver
+          azure-file-volume-share-name: ${{ AZ_STORAGE_SHARE_NAME }}
+          azure-file-volume-account-name: ${{ secrets.AZ_STORAGE_ACCOUNT_NAME }}
+          azure-file-volume-account-key: ${{ secrets.AZ_STORAGE_ACCOUNT_KEY }}
+          azure-file-volume-mount-path: /mnt/volume
           location: "southeastasia"
