@@ -23,7 +23,9 @@ public class Customer {
 		return s;
 	}
 
-	public void addAccount(Account account) {
+	public boolean addAccount(Account account) { //changed to boolean so NewAccount can call it
 		accounts.add(account);
+		return true;
+
 	}
 }

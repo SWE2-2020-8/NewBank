@@ -37,13 +37,23 @@ public class NewBank {
 	}
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request) {
+	public synchronized String processRequest(CustomerID customer,
+											  String request) {
+		String[] words = request.split(" ");
+
 		if (customers.containsKey(customer.getKey())) {
 			switch (request) {
-			case "SHOWMYACCOUNTS":
-				return showMyAccounts(customer);
-			default:
-				return "FAIL";
+				case "SHOWMYACCOUNTS":
+					return showMyAccounts(customer);
+				case "NEWACCOUNT": //created this so customer can call new account
+					if(words.length == 2){
+						return newAccount(customer, words[1]);
+					}
+					else {
+						return "FAIL";
+					}
+
+				default : return "FAIL";
 			}
 		}
 		return "FAIL";
@@ -53,4 +63,13 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	//added newAccount so customer can create new accounts
+	private String newAccount(CustomerID customer, String accountName) {
+		Customer Customer = customers.get(customer.getKey());
+		if (Customer.addAccount(new Account(accountName, 0.0))) {
+			return "SUCCESS";
+		} else {
+			return "FAIL";
+		}
+	}
 }
