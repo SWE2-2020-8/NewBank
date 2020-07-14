@@ -49,7 +49,7 @@ public class NewBankServer extends Thread {
 
                 if (s.getRemoteSocketAddress()
                         .toString()
-                        .matches("^/10\\.240\\.255\\.")) {
+                        .matches("10\\.240\\.255\\.")) {
 
                     // Liveness probe from Azure
                     System.err.println(this.getClass().getName()
