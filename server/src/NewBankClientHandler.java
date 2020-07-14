@@ -51,7 +51,7 @@ public class NewBankClientHandler extends Thread {
             out.println("Checking Details...");
             // authenticate user and get customer ID token from bank for use in
             // subsequent requests
-            CustomerID customer = bank.checkLogInDetails(userName, password);
+            Customer customer = bank.checkLogInDetails(userName, password);
             // if the user is authenticated then get requests from the user and
             // process them
             if (customer != null) {
@@ -61,7 +61,7 @@ public class NewBankClientHandler extends Thread {
                 out.println("Log In Successful. What do you want to do?");
                 System.err.println(this.getClass().getName() + ": "
                         + adress.toString() + " SUCCESSFUL LOGIN FROM "
-                        + customer.getKey());
+                        + customer.getUserName());
                 /*
                  * service loop
                  */
@@ -73,9 +73,9 @@ public class NewBankClientHandler extends Thread {
                         throw (new EOFException());
                     }
 
-                    System.err.println(
-                            this.getClass().getName() + ": " + adress.toString()
-                                    + " REQUEST FROM " + customer.getKey());
+                    System.err.println(this.getClass().getName() + ": "
+                            + adress.toString() + " REQUEST FROM "
+                            + customer.getUserName());
                     /*
                      * This is where the specific requests are processed
                      */

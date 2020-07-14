@@ -1,89 +1,105 @@
-
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+/**
+ * NewBank class
+ * 
+ * Singleton pattern, just one. Class to manage the bank, loading the database,
+ * indentifying customers, processing requests etc.
+ * 
+ */
 public class NewBank {
 
-    private static final NewBank bank = new NewBank();
-    private HashMap<String, Customer> customers;
-    private Authenticate auth;
+    private static final NewBank bank = new NewBank(); // Creating the singleton
+    private Map<String, Customer> customers;
 
+    /**
+     * Private NewBank constructor
+     * 
+     * Loads the bank customers
+     */
     private NewBank() {
-        customers = new HashMap<>();
-        addTestData();
-        auth = new Authenticate(customers);
+        BankCosmosDb newBankDatabase = new BankCosmosDb();
+        this.customers = newBankDatabase.loadBankCustomers();
+        newBankDatabase.loadBankAccounts(this.customers);
     }
 
-    private void addTestData() {
-        Customer bhagy = new Customer("hi");
-        bhagy.addAccount(new Account("Main", 1000.0));
-        customers.put("Bhagy", bhagy);
-
-        Customer christina = new Customer("lol");
-        christina.addAccount(new Account("Savings", 1500.0));
-        customers.put("Christina", christina);
-
-        Customer john = new Customer("nhoj");
-        john.addAccount(new Account("Checking", 250.0));
-        customers.put("John", john);
-    }
-
+    /**
+     * Serving the NewBank singleton
+     * 
+     * @return the singleton
+     */
     public static NewBank getBank() {
         return bank;
     }
 
-    public synchronized CustomerID checkLogInDetails(String userName,
-            String password) {
-        return auth.checkLogInDetails(userName, password);
+    /**
+     * Method to get the Customer object if the user exists and the username and
+     * password are correct
+     * 
+     * @param userName
+     * @param password
+     * @return the Customer
+     */
+    public Customer checkLogInDetails(String userName, String password) {
 
+        Customer foundUser = Customer.getCustomer(userName);
+        return Objects.nonNull(foundUser) && foundUser.isPasswordOK(password)
+                ? foundUser
+                : null;
+    }
+
+    /**
+     * Get the user accounts for a customer
+     * 
+     * @param customer
+     * @return
+     */
+    private String showMyAccounts(Customer customer) {
+        return customer.accountsToString();
     }
 
     /*
      * commands from the NewBank customer are processed in this method
      */
-    public synchronized String processRequest(CustomerID customer,
+    public synchronized String processRequest(Customer customer,
             String request) {
 
         String[] words = request.split(" ");
 
-        if (customers.containsKey(customer.getKey())) {
+        System.err.println(this.getClass().getName() + ": "
+                + customer.getUserName() + " REQUESTS \"" + request + "\"");
 
-            System.err.println(this.getClass().getName() + ": "
-                    + customer.getKey() + " REQUESTS \"" + request + "\"");
-            switch (request) {
-            case "SHOWMYACCOUNTS":
-                return showMyAccounts(customer);
-            case "NEWACCOUNT": // created this so customer can call new account
-                if (words.length == 2) {
-                    return newAccount(customer, words[1]);
+        switch (words[0]) {
 
-                } else {
-                    System.err.println(
-                            this.getClass().getName() + ": " + customer.getKey()
-                                    + " FAILED REQUEST \"" + request + "\"");
-                    return "FAIL";
-                }
+        case "SHOWMYACCOUNTS":
+            return showMyAccounts(customer);
 
-            default:
+        case "NEWACCOUNT": // created this so customer can call new account
+            if (words.length == 2) {
+                customer.addAccount(words[1], 0.0);
+
                 System.err.println(this.getClass().getName() + ": "
-                        + customer.getKey() + " ILLEGAL REQUEST");
+                        + customer.getUserName() + " ADDED ACCOUNT "
+                        + words[1]);
+
+                return "SUCCESS";
+
+            } else {
+
+                System.err.println(this.getClass().getName() + ": "
+                        + customer.getUserName() + " FAILED REQUEST \""
+                        + request + "\"");
+
                 return "FAIL";
             }
-        }
-        return "FAIL";
-    }
 
-    private String showMyAccounts(CustomerID customer) {
-        return (customers.get(customer.getKey())).accountsToString();
-    }
-
-    // added newAccount so customer can create new accounts
-    private String newAccount(CustomerID customer, String accountName) {
-        Customer Customer = customers.get(customer.getKey());
-        if (Customer.addAccount(new Account(accountName, 0.0))) {
-            return "SUCCESS";
-        } else {
+        default:
+            System.err.println(this.getClass().getName() + ": "
+                    + customer.getUserName() + " ILLEGAL REQUEST");
             return "FAIL";
         }
+
     }
+
 }
