@@ -47,23 +47,13 @@ public class NewBankServer extends Thread {
                  */
                 Socket s = server.accept();
 
-                if (s.getRemoteSocketAddress()
-                        .toString()
-                        .matches("/10\\.240\\.255\\..*")) {
+                System.err.println(this.getClass().getName()
+                        + ": NEW CONNECTION CREATED, SENDING TO HANDLER");
 
-                    // Liveness probe from Azure
-                    System.err.println(this.getClass().getName()
-                            + ": AZURE LIVENESS PROBE");
+                NewBankClientHandler clientHandler = new NewBankClientHandler(
+                        s);
+                clientHandler.start();
 
-                } else {
-                    // Real client
-                    System.err.println(this.getClass().getName()
-                            + ": NEW CONNECTION CREATED, SENDING TO HANDLER");
-
-                    NewBankClientHandler clientHandler = new NewBankClientHandler(
-                            s);
-                    clientHandler.start();
-                }
             }
         } catch (IOException e) {
 
