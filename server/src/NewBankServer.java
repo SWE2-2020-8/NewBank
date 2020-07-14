@@ -46,14 +46,24 @@ public class NewBankServer extends Thread {
                  * awaits the next connection request into the server socket
                  */
                 Socket s = server.accept();
-                System.err.println(this.getClass().getName()
-                        + ": NEW CONNECTION CREATED, SENDING TO HANDLER");
-                /*
-                 * After the new connection a new client handler is created
-                 */
-                NewBankClientHandler clientHandler = new NewBankClientHandler(
-                        s);
-                clientHandler.start();
+
+                if (s.getRemoteSocketAddress()
+                        .toString()
+                        .matches("^/10.240.255.")) {
+
+                    // Liveness probe from Azure
+                    System.err.println(this.getClass().getName()
+                            + ": AZURE LIVENESS PROBE");
+
+                } else {
+                    // Real client
+                    System.err.println(this.getClass().getName()
+                            + ": NEW CONNECTION CREATED, SENDING TO HANDLER");
+
+                    NewBankClientHandler clientHandler = new NewBankClientHandler(
+                            s);
+                    clientHandler.start();
+                }
             }
         } catch (IOException e) {
 
