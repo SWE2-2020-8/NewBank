@@ -84,6 +84,14 @@ public class NewBankServer extends Thread {
      * 
      * socat - TCP4:localhost:80
      * 
+     * or when executed from azure
+     * 
+     * socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80
+     * 
+     * with the container logs to be observed with
+     * 
+     * az container attach --name bankserver
+     * 
      * Note that this will have to change if we instrument the port or change it
      * in the future
      */

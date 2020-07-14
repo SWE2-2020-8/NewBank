@@ -324,7 +324,7 @@ Note: **storage will be mounted to /mnt/volume**
 ```
 FQDN                                               ProvisioningState
 -------------------------------------------------  -------------------
-gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
+swe2-2020-8.southeastasia.azurecontainer.io  Succeeded
 ```
 
 * Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80` **DONE**
@@ -404,11 +404,13 @@ gabriel2020swe814.southeastasia.azurecontainer.io  Succeeded
 
 ```
 
-and another way to interact with them:
+Opening a shell into a container
 
 `az container exec --container-name bankserver --exec-command sh --name bankserver`
 
+And seeing the server logs
 
+`az container attach --name bankserver`
 
 
 ## My first approach, pushing the container to dockerhub

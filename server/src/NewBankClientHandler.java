@@ -101,8 +101,8 @@ public class NewBankClientHandler extends Thread {
         } catch (IOException e) {
             // Other I/O exceptions
             System.err.println(this.getClass().getName() + ": "
-                    + adress.toString() + " HANDLER COULD NOT START");
-            e.printStackTrace();
+                    + adress.toString() + " CONNECTION RESET");
+            // e.printStackTrace();
 
         } finally {
             try {
