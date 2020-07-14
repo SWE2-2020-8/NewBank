@@ -18,7 +18,7 @@ public class NewBankServer extends Thread {
     private ServerSocket server;
 
     /*
-     * Constructor, listen to the selected port
+     * Constructor, creates a server socket that listens for inbound connections
      */
     public NewBankServer(int port) throws IOException {
         server = new ServerSocket(port);
@@ -35,14 +35,15 @@ public class NewBankServer extends Thread {
         try {
             while (true) {
                 /*
-                 * Blocks, listens to the server socket and when there's a new
-                 * connection, it gives it to a handler
+                 * Blocks waiting for the server socket for a new connection
+                 * request, it gives it to a handler to take care of the
+                 * connection (socket)
                  * 
-                 * This means that as many sockets are made as clients
-                 * connecting to the server
+                 * This means that as many sockets are made as clients are
+                 * actually connecting to the server
                  * 
                  * Loops back once gives the connection to the handler and
-                 * awaits the next one
+                 * awaits the next connection request into the server socket
                  */
                 Socket s = server.accept();
                 System.err.println(this.getClass().getName()
@@ -77,6 +78,15 @@ public class NewBankServer extends Thread {
         }
     }
 
+    /*
+     * If you run locally and not in a container (clicking run after this
+     * comment in vscode) you can interact with a terminal with the command:
+     * 
+     * socat - TCP4:localhost:80
+     * 
+     * Note that this will have to change if we instrument the port or change it
+     * in the future
+     */
     public static void main(String[] args) throws IOException {
         /*
          * starts a new NewBankServer thread on a specified port number
