@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.security.auth.x500.X500Principal;
+
 /**
  * NewBank class
  * 
@@ -82,12 +84,12 @@ public class NewBank {
          option.add("MOVE <Amount> <From> <To> : to move money from account to another account." + "\n");
          option.add("PAY <Person/Company> <Amount> : to transfer money to others." + "\n");
 
-         String s = "";
+         String x = "";
 
          for (String options : option){
-             s = option + "\n\n";
+             x = option + "\n\n";
          }
-         return s;
+         return x;
     
         }
        
@@ -112,8 +114,6 @@ public class NewBank {
 
                 return "FAIL";
             }
-        
-     
 
         default:
             System.err.println(this.getClass().getName() + ": "
@@ -122,7 +122,5 @@ public class NewBank {
         }
 
     }
-
-
 
 }
