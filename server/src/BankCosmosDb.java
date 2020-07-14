@@ -1,4 +1,3 @@
-import java.util.List;
 import java.util.Map;
 
 import com.azure.cosmos.ConsistencyLevel;
@@ -13,8 +12,6 @@ import com.azure.cosmos.models.CosmosDatabaseRequestOptions;
 import com.azure.cosmos.models.CosmosDatabaseResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class BankCosmosDb {
 
     /*
@@ -22,15 +19,18 @@ public class BankCosmosDb {
      * 
      * temporarily hardcoded though
      */
-    public static String MASTER_KEY = System.getProperty("ACCOUNT_KEY",
-            StringUtils.defaultString(
-                    StringUtils.trimToNull(System.getenv().get("ACCOUNT_KEY")),
-                    "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ=="));
+    // public static String MASTER_KEY = System.getProperty("ACCOUNT_KEY",
+    // StringUtils.defaultString(
+    // StringUtils.trimToNull(System.getenv().get("ACCOUNT_KEY")),
+    // "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ=="));
 
-    public static String HOST = System.getProperty("ACCOUNT_HOST",
-            StringUtils.defaultString(
-                    StringUtils.trimToNull(System.getenv().get("ACCOUNT_HOST")),
-                    "https://swe2-2020-8.documents.azure.com:443/"));
+    // public static String HOST = System.getProperty("ACCOUNT_HOST",
+    // StringUtils.defaultString(
+    // StringUtils.trimToNull(System.getenv().get("ACCOUNT_HOST")),
+    // "https://swe2-2020-8.documents.azure.com:443/"));
+
+    private static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
+    private static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
 
     private static final String DATABASE_NAME = "newBank";
     private static final String CONTAINER_IDENTITY = "Identity";
