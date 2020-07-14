@@ -58,10 +58,11 @@ public class NewBankClientHandler extends Thread {
                 /*
                  * login successful
                  */
-                out.println("Log In Successful. What do you want to do?");
+                out.println("Log In Successful. What do you want to do?, To view options type OPTIONS"); //added statment so client can know how to access the options page
                 System.err.println(this.getClass().getName() + ": "
                         + adress.toString() + " SUCCESSFUL LOGIN FROM "
                         + customer.getUserName());
+                
                 /*
                  * service loop
                  */

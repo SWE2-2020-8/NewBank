@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -72,6 +73,24 @@ public class NewBank {
 
         switch (words[0]) {
 
+        case "OPTIONS": // so customer can navigate through functions eaisly
+        if(words.length == 1){
+         ArrayList<String> option = new ArrayList<>();
+         option.add("Options avilable are:" + "\n");
+         option.add("SHOWMYACCOUNTS : to view all Accounts under your name." + "\n");
+         option.add("NEWACCOUNT <Name> : to create new account e.g. creating a savings account." + "\n");
+         option.add("MOVE <Amount> <From> <To> : to move money from account to another account." + "\n");
+         option.add("PAY <Person/Company> <Amount> : to transfer money to others." + "\n");
+
+         String s = "";
+
+         for (String options : option){
+             s = option + "\n\n";
+         }
+         return s;
+    
+        }
+       
         case "SHOWMYACCOUNTS":
             return showMyAccounts(customer);
 
@@ -93,6 +112,8 @@ public class NewBank {
 
                 return "FAIL";
             }
+        
+     
 
         default:
             System.err.println(this.getClass().getName() + ": "
@@ -101,5 +122,7 @@ public class NewBank {
         }
 
     }
+
+
 
 }
