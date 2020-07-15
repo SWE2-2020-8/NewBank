@@ -44,7 +44,7 @@ public class Customer {
      */
     public static boolean isCustomer(String userName) {
 
-        return allCustomersMap.keySet().contains(userName);
+        return Customer.allCustomersMap.keySet().contains(userName);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Customer {
      */
     public static Customer getCustomer(String userName) {
 
-        return allCustomersMap.get(userName);
+        return Customer.allCustomersMap.get(userName);
     }
 
     /*
@@ -64,7 +64,16 @@ public class Customer {
      */
     public String getUserName() {
 
-        return userName;
+        return this.userName;
+    }
+
+    /*
+     * Get the password
+     * 
+     */
+    public String getPassword() {
+
+        return this.password;
     }
 
     /**
@@ -82,7 +91,7 @@ public class Customer {
      */
     public List<Account> getAccounts() {
 
-        return accounts;
+        return this.accounts;
     }
 
     /*
@@ -90,7 +99,7 @@ public class Customer {
      */
     public void addAccount(Account account) {
 
-        accounts.add(account);
+        this.accounts.add(account);
     }
 
     /*
@@ -106,7 +115,7 @@ public class Customer {
      */
     public static Map<String, Customer> getAllCustomersMap() {
 
-        return allCustomersMap;
+        return Customer.allCustomersMap;
     }
 
     /*

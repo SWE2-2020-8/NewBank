@@ -114,7 +114,12 @@ public class BankCosmosDb {
     // Create a customer document in container
     private void createDocument(Customer customer) {
 
-        container.createItem(customer, new PartitionKey(customer.getUserName()),
+        CustomerRecord customerRecord = new CustomerRecord();
+        customerRecord.setUserName(customer.getUserName());
+        customerRecord.setPassword(customer.getPassword());
+
+        container.createItem(customerRecord,
+                new PartitionKey(customerRecord.getUserName()),
                 new CosmosItemRequestOptions());
     }
 
