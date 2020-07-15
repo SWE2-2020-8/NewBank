@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.security.auth.x500.X500Principal;
-
 /**
  * NewBank class
  * 
@@ -23,8 +21,9 @@ public class NewBank {
      */
     private NewBank() {
         BankCosmosDb newBankDatabase = new BankCosmosDb();
-        this.customers = newBankDatabase.loadBankCustomers();
-        newBankDatabase.loadBankAccounts(this.customers);
+        newBankDatabase.loadBankCustomers();
+        this.customers = Customer.getCustomers();
+        newBankDatabase.loadBankAccounts();
     }
 
     /**
@@ -76,23 +75,28 @@ public class NewBank {
         switch (words[0]) {
 
         case "OPTIONS": // so customer can navigate through functions eaisly
-        if(words.length == 1){
-         ArrayList<String> option = new ArrayList<>();
-         option.add("Options avilable are:" + "\n");
-         option.add("SHOWMYACCOUNTS : to view all Accounts under your name." + "\n");
-         option.add("NEWACCOUNT <Name> : to create new account e.g. creating a savings account." + "\n");
-         option.add("MOVE <Amount> <From> <To> : to move money from account to another account." + "\n");
-         option.add("PAY <Person/Company> <Amount> : to transfer money to others." + "\n");
 
-         String x = "";
+            ArrayList<String> option = new ArrayList<>();
+            option.add("Options avilable are:" + "\n");
+            option.add("SHOWMYACCOUNTS : to view all Accounts under your name."
+                    + "\n");
+            option.add(
+                    "NEWACCOUNT <Name> : to create new account e.g. creating a savings account."
+                            + "\n");
+            option.add(
+                    "MOVE <Amount> <From> <To> : to move money from account to another account."
+                            + "\n");
+            option.add(
+                    "PAY <Person/Company> <Amount> : to transfer money to others."
+                            + "\n");
 
-         for (String options : option){
-             x = option + "\n\n";
-         }
-         return x;
-    
-        }
-       
+            String x = "";
+
+            for (String options : option) {
+                x = option + "\n\n";
+            }
+            return x;
+
         case "SHOWMYACCOUNTS":
             return showMyAccounts(customer);
 
