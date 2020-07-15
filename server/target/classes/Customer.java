@@ -1,28 +1,9 @@
-package newbank.server;
-
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Customer {
-<<<<<<< Updated upstream
-	
-	private ArrayList<Account> accounts;
-	
-	public Customer() {
-		accounts = new ArrayList<>();
-	}
-	
-	public String accountsToString() {
-		String s = "";
-		for(Account a : accounts) {
-			s += a.toString();
-		}
-		return s;
-	}
-
-	public void addAccount(Account account) {
-		accounts.add(account);		
-	}
-=======
 
     private static Map<String, Customer> allCustomersMap = new HashMap<>();
     private String userName;
@@ -149,5 +130,4 @@ public class Customer {
         return s.toString();
     }
 
->>>>>>> Stashed changes
 }

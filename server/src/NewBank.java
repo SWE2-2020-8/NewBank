@@ -1,8 +1,5 @@
-package newbank.server;
+import java.util.Objects;
 
-<<<<<<< Updated upstream
-import java.util.HashMap;
-=======
 /**
  * NewBank class
  * 
@@ -13,7 +10,6 @@ import java.util.HashMap;
 public class NewBank {
 
     private static final NewBank bank = new NewBank(); // Creating the singleton
-    private Map<String, Customer> customers;
 
     /**
      * Private NewBank constructor
@@ -23,7 +19,6 @@ public class NewBank {
     private NewBank() {
         BankCosmosDb newBankDatabase = new BankCosmosDb();
         newBankDatabase.loadBankCustomers();
-        this.customers = Customer.getAllCustomersMap();
         newBankDatabase.loadBankAccounts();
     }
 
@@ -76,70 +71,50 @@ public class NewBank {
         switch (words[0]) {
 
         case "OPTIONS": // so customer can navigate through functions eaisly
-
-            ArrayList<String> option = new ArrayList<>();
-            option.add("Options avilable are:" + "\n");
-            option.add("SHOWMYACCOUNTS : to view all Accounts under your name."
-                    + "\n");
-            option.add(
+            StringBuilder option = new StringBuilder();
+            option.append("Options avilable are:" + "\n");
+            option.append(
+                    "SHOWMYACCOUNTS : to view all Accounts under your name."
+                            + "\n");
+            option.append(
                     "NEWACCOUNT <Name> : to create new account e.g. creating a savings account."
                             + "\n");
-            option.add(
+            option.append(
                     "MOVE <Amount> <From> <To> : to move money from account to another account."
                             + "\n");
-            option.add(
+            option.append(
                     "PAY <Person/Company> <Amount> : to transfer money to others."
                             + "\n");
->>>>>>> Stashed changes
+            return option.toString();
 
-public class NewBank {
-	
-	private static final NewBank bank = new NewBank();
-	private HashMap<String,Customer> customers;
-	
-	private NewBank() {
-		customers = new HashMap<>();
-		addTestData();
-	}
-	
-	private void addTestData() {
-		Customer bhagy = new Customer();
-		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put("Bhagy", bhagy);
-		
-		Customer christina = new Customer();
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-		
-		Customer john = new Customer();
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
-	}
-	
-	public static NewBank getBank() {
-		return bank;
-	}
-	
-	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
-			return new CustomerID(userName);
-		}
-		return null;
-	}
+        case "SHOWMYACCOUNTS":
+            return showMyAccounts(customer);
 
-	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request) {
-		if(customers.containsKey(customer.getKey())) {
-			switch(request) {
-			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-			default : return "FAIL";
-			}
-		}
-		return "FAIL";
-	}
-	
-	private String showMyAccounts(CustomerID customer) {
-		return (customers.get(customer.getKey())).accountsToString();
-	}
+        case "NEWACCOUNT": // created this so customer can call new account
+            if (words.length == 2) {
+                customer.addAccount(words[1], 0.0);
+
+                System.err.println(this.getClass().getName() + ": "
+                        + customer.getUserName() + " ADDED ACCOUNT "
+                        + words[1]);
+
+                return "SUCCESS";
+
+            } else {
+
+                System.err.println(this.getClass().getName() + ": "
+                        + customer.getUserName() + " FAILED REQUEST \""
+                        + request + "\"");
+
+                return "FAIL";
+            }
+
+        default:
+            System.err.println(this.getClass().getName() + ": "
+                    + customer.getUserName() + " ILLEGAL REQUEST");
+            return "FAIL";
+        }
+
+    }
 
 }
