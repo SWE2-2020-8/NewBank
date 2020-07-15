@@ -30,8 +30,7 @@ public class NewBankServer extends Thread {
     @Override
     public void run() {
 
-        System.err.println(this.getClass().getName()
-                + ": NEW SERVER LISTENING ON " + server.getLocalPort());
+        printTrace("NEW SERVER LISTENING ON " + server.getLocalPort());
         try {
             while (true) {
                 /*
@@ -47,8 +46,7 @@ public class NewBankServer extends Thread {
                  */
                 Socket s = server.accept();
 
-                System.err.println(this.getClass().getName()
-                        + ": NEW CONNECTION CREATED, SENDING TO HANDLER");
+                printTrace("NEW CONNECTION CREATED, SENDING TO HANDLER");
 
                 NewBankClientHandler clientHandler = new NewBankClientHandler(
                         s);
@@ -57,8 +55,7 @@ public class NewBankServer extends Thread {
             }
         } catch (IOException e) {
 
-            System.err.println(this.getClass().getName()
-                    + ": COULD NOT MAKE MORE CONNECTIONS");
+            printTrace("COULD NOT MAKE MORE CONNECTIONS");
             e.printStackTrace();
 
         } finally {
@@ -70,8 +67,7 @@ public class NewBankServer extends Thread {
 
             } catch (IOException e) {
                 // Couldn't even close!
-                System.err.println(this.getClass().getName()
-                        + ": COULD NOT CLOSE THE SERVER");
+                printTrace("COULD NOT CLOSE THE SERVER");
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
@@ -96,6 +92,12 @@ public class NewBankServer extends Thread {
      * in the future
      */
     public static void main(String[] args) throws IOException {
+
+        /*
+         * Connects to the Azure database and loads users
+         */
+        BankCosmosDb testDb = new BankCosmosDb();
+        testDb.loadBankCustomers();
         /*
          * starts a new NewBankServer thread on a specified port number
          * 
@@ -108,5 +110,13 @@ public class NewBankServer extends Thread {
          * thread, will run the code in "run"
          */
         new NewBankServer(80).start();
+    }
+
+    /*
+     * Auxiliary trace method to print in the console to correct errors
+     */
+    private void printTrace(String message) {
+
+        System.err.println(this.getClass().getName() + ": " + message);
     }
 }

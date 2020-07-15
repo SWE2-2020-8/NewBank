@@ -47,16 +47,6 @@ public class NewBank {
                 : null;
     }
 
-    /**
-     * Get the user accounts for a customer
-     * 
-     * @param customer
-     * @return
-     */
-    private String showMyAccounts(Customer customer) {
-        return customer.accountsToString();
-    }
-
     /*
      * commands from the NewBank customer are processed in this method
      */
@@ -64,57 +54,158 @@ public class NewBank {
             String request) {
 
         String[] words = request.split(" ");
+        String command = words[0];
+        String param1 = "";
+        if (words.length > 1)
+            param1 = words[1];
+        String param2 = "";
+        if (words.length > 2)
+            param2 = words[2];
+        String param3 = "";
+        if (words.length > 3)
+            param2 = words[3];
 
-        System.err.println(this.getClass().getName() + ": "
-                + customer.getUserName() + " REQUESTS \"" + request + "\"");
-
-        switch (words[0]) {
+        switch (command) {
 
         case "OPTIONS": // so customer can navigate through functions eaisly
-            StringBuilder option = new StringBuilder();
-            option.append("Options avilable are:" + "\n");
-            option.append(
-                    "SHOWMYACCOUNTS : to view all Accounts under your name."
-                            + "\n");
-            option.append(
-                    "NEWACCOUNT <Name> : to create new account e.g. creating a savings account."
-                            + "\n");
-            option.append(
-                    "MOVE <Amount> <From> <To> : to move money from account to another account."
-                            + "\n");
-            option.append(
-                    "PAY <Person/Company> <Amount> : to transfer money to others."
-                            + "\n");
-            return option.toString();
+            return options(customer);
 
         case "SHOWMYACCOUNTS":
             return showMyAccounts(customer);
 
         case "NEWACCOUNT": // created this so customer can call new account
-            if (words.length == 2) {
-                customer.addAccount(words[1], 0.0);
+            return newAccount(customer, param1);
 
-                System.err.println(this.getClass().getName() + ": "
-                        + customer.getUserName() + " ADDED ACCOUNT "
-                        + words[1]);
+        case "MOVE":
+            return NewBank.FAIL;
 
-                return "SUCCESS";
+        case "PAY":
+            return NewBank.FAIL;
 
-            } else {
+        case "ADDUSER": // created this so customer can call new account
+            return addUser(customer, param1, param2);
 
-                System.err.println(this.getClass().getName() + ": "
-                        + customer.getUserName() + " FAILED REQUEST \""
-                        + request + "\"");
-
-                return "FAIL";
-            }
+        case "LISTUSERS": // created this so customer can call new account
+            return listUsers(customer);
 
         default:
-            System.err.println(this.getClass().getName() + ": "
-                    + customer.getUserName() + " ILLEGAL REQUEST");
-            return "FAIL";
+            printTrace(customer, "Invalid input (try OPTIONS)");
+            return NewBank.FAIL;
         }
 
+    }
+
+    /*
+     * Capabilities follow, just create the method below
+     *
+     * Use the constants to return success and fail to avoid typos
+     * 
+     * Use printTrace to output a message in the console for traceability
+     */
+
+    static final String SUCCESS = "SUCCESS";
+    static final String FAIL = "FAIL";
+
+    /*
+     * List the options
+     * 
+     */
+    private String options(Customer customer) {
+
+        printTrace(customer, "Options listed");
+        String s;
+        s = "Options avilable are:\n";
+        s += "SHOWMYACCOUNTS : to view all Accounts under your name.\n";
+        s += "NEWACCOUNT <Account Name> : to create new account \n";
+        s += "MOVE <Amount> <From Account> <To Account> : to move money\n";
+        s += "PAY <UserID> <Amount> : to transfer money\n";
+        s += "CHANGEPASSWORD <Old Password> <New Password> : change password\n";
+        s += "ADDUSER <UserID> <Password> : create user (only admin)\n";
+        s += "LISTUSERS : list users (only admin)\n";
+        return s + NewBank.SUCCESS;
+    }
+
+    /*
+     * Get the user accounts for a customer
+     * 
+     */
+    private String showMyAccounts(Customer customer) {
+
+        printTrace(customer, "Accounts listed");
+        return customer.accountsToString() + NewBank.SUCCESS;
+    }
+
+    /*
+     * Open a new account for a customer
+     * 
+     */
+    private String newAccount(Customer customer, String accountName) {
+
+        if (accountName.length() > 3) {
+            customer.addAccount(accountName, 0.0);
+            printTrace(customer, "Account added " + accountName);
+            return NewBank.SUCCESS;
+        } else {
+            printTrace(customer, "Account not added");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * Add a new user
+     * 
+     */
+    private String addUser(Customer customer, String userName,
+            String password) {
+
+        if (userName.length() > 3 && password.length() > 3
+                && customer.getUserName().equals("Admin")
+                && !Customer.getAllCustomersMap().containsKey(userName)) {
+
+            BankCosmosDb testDb = new BankCosmosDb();
+            testDb.retrieveOrCreateDatabase(BankCosmosDb.DATABASE_NAME);
+            testDb.retrieveOrCreateContainer(BankCosmosDb.CONTAINER_ACCOUNTS,
+                    "/id");
+            testDb.createCustomerDocument(new Customer(userName, password));
+
+            printTrace(customer, "User added " + userName);
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Account not added");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * List users
+     * 
+     */
+    private String listUsers(Customer customer) {
+
+        if (customer.getUserName().equals("Admin")) {
+
+            StringBuilder sb = new StringBuilder();
+            Customer.getAllCustomersMap()
+                    .entrySet()
+                    .forEach(es -> sb.append(es.getKey() + "\t"
+                            + es.getValue().getPassword() + "\n"));
+            printTrace(customer, "Users listed");
+            return sb.toString() + NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Users not listed");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * Auxiliary trace method to print in the console to correct errors
+     */
+    private void printTrace(Customer customer, String message) {
+
+        System.err.println(this.getClass().getName() + ": "
+                + customer.getUserName() + " " + message);
     }
 
 }

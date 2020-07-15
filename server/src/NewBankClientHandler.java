@@ -20,7 +20,7 @@ public class NewBankClientHandler extends Thread {
     private NewBank bank;
     private BufferedReader in;
     private PrintWriter out;
-    private SocketAddress adress;
+    private SocketAddress address;
 
     /*
      * Constructor, is given a specific socket, creates a new bank object, opens
@@ -30,7 +30,7 @@ public class NewBankClientHandler extends Thread {
         bank = NewBank.getBank();
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
-        adress = s.getRemoteSocketAddress();
+        address = s.getRemoteSocketAddress();
     }
 
     @Override
@@ -40,8 +40,7 @@ public class NewBankClientHandler extends Thread {
             /*
              * login section
              */
-            System.err.println(this.getClass().getName() + ": "
-                    + adress.toString() + " NEW HANDLER STARTED ");
+            printTrace(address, "NEW HANDLER STARTED ");
 
             out.println("Enter Username");
             String userName = in.readLine();
@@ -57,22 +56,9 @@ public class NewBankClientHandler extends Thread {
                 /*
                  * login successful
                  */
-                out.println(
-                        "Log In Successful. What do you want to do?, To view options type OPTIONS"); // added
-                                                                                                     // statment
-                                                                                                     // so
-                                                                                                     // client
-                                                                                                     // can
-                                                                                                     // know
-                                                                                                     // how
-                                                                                                     // to
-                                                                                                     // access
-                                                                                                     // the
-                                                                                                     // options
-                                                                                                     // page
-                System.err.println(this.getClass().getName() + ": "
-                        + adress.toString() + " SUCCESSFUL LOGIN FROM "
-                        + customer.getUserName());
+                out.println("Log In Successful (type OPTIONS for help)");
+                printTrace(address,
+                        "SUCCESSFUL LOGIN FROM " + customer.getUserName());
 
                 /*
                  * service loop
@@ -85,9 +71,8 @@ public class NewBankClientHandler extends Thread {
                         throw (new EOFException());
                     }
 
-                    System.err.println(this.getClass().getName() + ": "
-                            + adress.toString() + " REQUEST FROM "
-                            + customer.getUserName());
+                    printTrace(address,
+                            "REQUEST FROM " + customer.getUserName());
                     /*
                      * This is where the specific requests are processed
                      */
@@ -100,20 +85,16 @@ public class NewBankClientHandler extends Thread {
                  * customer rejection
                  */
                 out.println("Log In Failed");
-                System.err.println(
-                        this.getClass().getName() + ": " + adress.toString()
-                                + " HANDLER TERMINATED - INCORRECT LOGIN");
+                printTrace(address, "HANDLER TERMINATED - INCORRECT LOGIN");
             }
         } catch (EOFException e) {
             // Connection interrupted
-            System.err.println(this.getClass().getName() + ": "
-                    + adress.toString() + " HANDLER EOF DETECTED");
+            printTrace(address, "HANDLER EOF DETECTED");
             // e.printStackTrace();
 
         } catch (IOException e) {
             // Other I/O exceptions
-            System.err.println(this.getClass().getName() + ": "
-                    + adress.toString() + " CONNECTION RESET");
+            printTrace(address, "CONNECTION RESET");
             // e.printStackTrace();
 
         } finally {
@@ -121,17 +102,23 @@ public class NewBankClientHandler extends Thread {
                 // Close all well
                 in.close();
                 out.close();
-                System.err.println(this.getClass().getName() + ": "
-                        + adress.toString() + " HANDLER CLOSED");
+                printTrace(address, "HANDLER CLOSED");
 
             } catch (IOException e) {
                 // Could not close
-                System.err.println(this.getClass().getName() + ": "
-                        + adress.toString() + " HANDLER COULD NOT BE CLOSED");
+                printTrace(address, "HANDLER COULD NOT BE CLOSED");
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
         }
     }
 
+    /*
+     * Auxiliary trace method to print in the console to correct errors
+     */
+    private void printTrace(SocketAddress addr, String message) {
+
+        System.err.println(this.getClass().getName() + ": " + addr.toString()
+                + " " + message);
+    }
 }

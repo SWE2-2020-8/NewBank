@@ -7,8 +7,7 @@ import com.azure.cosmos.models.CosmosContainerProperties;
 import com.azure.cosmos.models.CosmosDatabaseProperties;
 import com.azure.cosmos.models.CosmosDatabaseRequestOptions;
 import com.azure.cosmos.models.CosmosDatabaseResponse;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
+import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
 public class BankCosmosDb {
@@ -111,22 +110,19 @@ public class BankCosmosDb {
         retrieveContainer(containerName);
     }
 
-    // Create a customer document in container
-    private void createDocument(Customer customer) {
-
-        CustomerRecord customerRecord = new CustomerRecord();
-        customerRecord.setUserName(customer.getUserName());
-        customerRecord.setPassword(customer.getPassword());
-
-        container.createItem(customerRecord,
-                new PartitionKey(customerRecord.getUserName()),
-                new CosmosItemRequestOptions());
-    }
-
     // Container read all
     CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
 
         return this.database.readAllContainers();
+    }
+
+    // Create a customer document in container
+    void createCustomerDocument(Customer customer) {
+
+        CustomerRecord customerRecord = new CustomerRecord();
+        customerRecord.setId(customer.getUserName());
+        customerRecord.setPassword(customer.getPassword());
+        container.createItem(customerRecord);
     }
 
     /*
@@ -134,26 +130,21 @@ public class BankCosmosDb {
      * 
      * Gets the customers from the database
      * 
-     * Starts with mockup
+     * If the database is damaged, the test method resetBankCustomers() (by
+     * default skipped) will create a default set of users and passwords
      *
      */
     void loadBankCustomers() {
 
-        retrieveOrCreateDatabase(BankCosmosDb.DATABASE_NAME);
-        retrieveOrCreateContainer(BankCosmosDb.CONTAINER_ACCOUNTS, "/userName");
+        retrieveDatabase(BankCosmosDb.DATABASE_NAME);
+        retrieveContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
 
-        if (!Customer.isCustomer("Bhagy"))
-            this.createDocument(
-                    new Customer("Bhagy", "hi").addAccount("Main", 1000.0));
-
-        if (!Customer.isCustomer("Christina"))
-            this.createDocument(new Customer("Christina", "lol")
-                    .addAccount("Savings", 1500.0));
-
-        if (!Customer.isCustomer("John"))
-            this.createDocument(
-                    new Customer("John", "nhoj").addAccount("Checking", 250.0));
-
+        CosmosPagedIterable<CustomerRecord> recoveredCustomerRecords = container
+                .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
+                        CustomerRecord.class);
+        recoveredCustomerRecords
+                .forEach(customerRecord -> new Customer(customerRecord.getId(),
+                        customerRecord.getPassword()));
     }
 
     /*

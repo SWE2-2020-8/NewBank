@@ -127,6 +127,15 @@ public class Customer {
     }
 
     /*
+     * toString()
+     */
+    @Override
+    public String toString() {
+
+        return "<" + this.userName + "/" + this.password + ">";
+    }
+
+    /*
      * Returns the accounts in string format
      */
     public String accountsToString() {
@@ -134,7 +143,7 @@ public class Customer {
         StringBuilder s = new StringBuilder();
 
         for (Account a : this.accounts)
-            s.append(a.toString() + " ");
+            s.append(a.toString() + "\n");
 
         return s.toString();
     }
