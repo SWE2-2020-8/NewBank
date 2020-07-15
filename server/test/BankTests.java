@@ -1,4 +1,3 @@
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -23,8 +22,11 @@ public class BankTests {
     @Test
     public void loadBankCustomersTest() {
 
-        BankCosmosDb testDb = new BankCosmosDb();
-        testDb.loadBankCustomers();
+        BankCosmosDb.initClientBankCosmosDb();
+        BankCosmosDb.retrieveDatabase();
+        BankCosmosDb.retrieveContainerIdentity();
+        BankCosmosDb.loadBankCustomers();
+
         System.err.println(Customer.getAllCustomersMap());
         assertTrue(Customer.getAllCustomersMap().size() > 0);
     }
@@ -33,41 +35,36 @@ public class BankTests {
     @Test
     public void resetBankCustomers() {
 
-        BankCosmosDb testDb = new BankCosmosDb();
-        testDb.deleteDatabase(BankCosmosDb.DATABASE_NAME);
-        testDb.retrieveOrCreateDatabase(BankCosmosDb.DATABASE_NAME);
-        testDb.retrieveOrCreateContainer(BankCosmosDb.CONTAINER_ACCOUNTS,
-                "/id");
+        BankCosmosDb.initClientBankCosmosDb();
+        BankCosmosDb.deleteDatabase();
+        BankCosmosDb.retrieveDatabase();
+        BankCosmosDb.retrieveContainerIdentity();
+        BankCosmosDb.loadBankCustomers();
 
-        testDb.createCustomerDocument(new Customer("Admin", "1234"));
-        testDb.createCustomerDocument(
+        BankCosmosDb.createCustomerDocument(new Customer("Admin", "1234"));
+        BankCosmosDb.createCustomerDocument(
                 new Customer("Bhagy", "hi").addAccount("Main", 1000.0));
-        testDb.createCustomerDocument(
+        BankCosmosDb.createCustomerDocument(
                 new Customer("Christina", "lol").addAccount("Savings", 1500.0));
-        testDb.createCustomerDocument(
+        BankCosmosDb.createCustomerDocument(
                 new Customer("John", "nhoj").addAccount("Checking", 250.0));
+
         assertTrue(Customer.getAllCustomersMap().size() > 0);
-    }
-
-    @Test
-    public void databaseExistsTest() {
-
-        BankCosmosDb testDb = new BankCosmosDb();
-        testDb.retrieveDatabase(BankCosmosDb.DATABASE_NAME);
-        assertEquals(BankCosmosDb.DATABASE_NAME, testDb.getDatabase().getId());
     }
 
     @Test
     public void containersExistTest() {
 
-        BankCosmosDb testDb = new BankCosmosDb();
-        testDb.retrieveDatabase(BankCosmosDb.DATABASE_NAME);
-        CosmosPagedIterable<CosmosContainerProperties> listContainers = testDb
+        BankCosmosDb.initClientBankCosmosDb();
+        BankCosmosDb.retrieveDatabase();
+        CosmosPagedIterable<CosmosContainerProperties> listContainers = BankCosmosDb
                 .retrieveAllContainers();
 
         List<String> listIds = listContainers.stream()
                 .map(CosmosContainerProperties::getId)
                 .collect(Collectors.toList());
+
+        System.err.println(listIds);
 
         assertTrue(listIds.contains(BankCosmosDb.CONTAINER_ACCOUNTS));
         assertTrue(listIds.contains(BankCosmosDb.CONTAINER_IDENTITY));

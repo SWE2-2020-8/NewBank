@@ -96,8 +96,10 @@ public class NewBankServer extends Thread {
         /*
          * Connects to the Azure database and loads users
          */
-        BankCosmosDb testDb = new BankCosmosDb();
-        testDb.loadBankCustomers();
+        BankCosmosDb.initClientBankCosmosDb();
+        BankCosmosDb.retrieveDatabase();
+        BankCosmosDb.retrieveContainerIdentity();
+        BankCosmosDb.loadBankCustomers();
         /*
          * starts a new NewBankServer thread on a specified port number
          * 

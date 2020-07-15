@@ -4,7 +4,6 @@ import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
 import com.azure.cosmos.models.CosmosContainerProperties;
-import com.azure.cosmos.models.CosmosDatabaseProperties;
 import com.azure.cosmos.models.CosmosDatabaseRequestOptions;
 import com.azure.cosmos.models.CosmosDatabaseResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
@@ -27,102 +26,88 @@ public class BankCosmosDb {
     // StringUtils.trimToNull(System.getenv().get("ACCOUNT_HOST")),
     // "https://swe2-2020-8.documents.azure.com:443/"));
 
-    static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
-    static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
-
-    static final String DATABASE_NAME = "newBank";
+    private static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
+    private static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
+    private static final String DATABASE_NAME = "newBank";
     static final String CONTAINER_IDENTITY = "Identity";
     static final String CONTAINER_ACCOUNTS = "Accounts";
-    private CosmosClient client;
-    private CosmosDatabase database;
-    private CosmosContainer container;
+    private static CosmosClient client;
+    private static CosmosDatabase database;
+    private static CosmosContainer containerIdentity;
+    private static CosmosContainer containerAccounts;
 
     /*
      * Constructor
      */
-    public BankCosmosDb() {
+    private BankCosmosDb() {
+    }
 
-        this.client = new CosmosClientBuilder().endpoint(BankCosmosDb.HOST)
+    /*
+     * Static methods
+     */
+    public static void initClientBankCosmosDb() {
+
+        BankCosmosDb.client = new CosmosClientBuilder()
+                .endpoint(BankCosmosDb.HOST)
                 .key(BankCosmosDb.MASTER_KEY)
                 .consistencyLevel(ConsistencyLevel.EVENTUAL)
                 .contentResponseOnWriteEnabled(true)
                 .buildClient();
     }
 
-    /*
-     * Generic methods
-     */
-
-    // Database getter
-    CosmosDatabase getDatabase() {
-
-        return this.database;
-    }
-
     // Database retrieve
-    void retrieveDatabase(final String databaseName) {
+    public static void retrieveDatabase() {
 
-        this.database = this.client.getDatabase(databaseName);
-    }
-
-    // Database retrieve or create
-    void retrieveOrCreateDatabase(final String databaseName) {
-
-        final CosmosDatabaseResponse databaseResponse = client
-                .createDatabaseIfNotExists(databaseName);
-        retrieveDatabase(databaseResponse.getProperties().getId());
-    }
-
-    // Database retrieve all
-    CosmosPagedIterable<CosmosDatabaseProperties> retrieveAllDatabases() {
-
-        return this.client.readAllDatabases();
+        BankCosmosDb.client
+                .createDatabaseIfNotExists(BankCosmosDb.DATABASE_NAME);
+        BankCosmosDb.database = BankCosmosDb.client
+                .getDatabase(BankCosmosDb.DATABASE_NAME);
     }
 
     // Database delete
-    void deleteDatabase(final String databaseName) {
+    public static void deleteDatabase() {
 
-        final CosmosDatabaseResponse dbResp = client.getDatabase(databaseName)
+        final CosmosDatabaseResponse dbResp = client
+                .getDatabase(BankCosmosDb.DATABASE_NAME)
                 .delete(new CosmosDatabaseRequestOptions());
-        System.err.println(this.getClass().getName()
-                + ": Status code for database delete: {}"
+
+        System.err.println(BankCosmosDb.class.getName()
+                + ": Status code for database delete: "
                 + dbResp.getStatusCode());
     }
 
-    // Container getter
-    CosmosContainer getContainer() {
-
-        return this.container;
-    }
-
     // Container retrieve
-    void retrieveContainer(final String containerName) {
+    public static void retrieveContainerIdentity() {
 
-        this.container = this.database.getContainer(containerName);
+        BankCosmosDb.database.createContainerIfNotExists(
+                new CosmosContainerProperties(BankCosmosDb.CONTAINER_IDENTITY,
+                        "/id"));
+        BankCosmosDb.containerIdentity = BankCosmosDb.database
+                .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    // Container retrieve or create
-    void retrieveOrCreateContainer(final String containerName,
-            final String key) {
+    public static void retrieveContainerAccounts() {
 
-        this.database.createContainerIfNotExists(
-                new CosmosContainerProperties(containerName, key));
-        retrieveContainer(containerName);
+        BankCosmosDb.database.createContainerIfNotExists(
+                new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
+                        "/id"));
+        BankCosmosDb.containerAccounts = BankCosmosDb.database
+                .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
     }
 
     // Container read all
-    CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
+    public static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
 
-        return this.database.readAllContainers();
+        return BankCosmosDb.database.readAllContainers();
     }
 
     // Create a customer document in container
-    void createCustomerDocument(Customer customer) {
+    public static void createCustomerDocument(Customer customer) {
 
         CustomerRecord customerRecord = new CustomerRecord();
         customerRecord.setId(customer.getUserName());
         customerRecord.setPassword(customer.getPassword());
-        container.createItem(customerRecord);
+        BankCosmosDb.containerIdentity.createItem(customerRecord);
     }
 
     /*
@@ -134,14 +119,12 @@ public class BankCosmosDb {
      * default skipped) will create a default set of users and passwords
      *
      */
-    void loadBankCustomers() {
+    public static void loadBankCustomers() {
 
-        retrieveDatabase(BankCosmosDb.DATABASE_NAME);
-        retrieveContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
-
-        CosmosPagedIterable<CustomerRecord> recoveredCustomerRecords = container
+        CosmosPagedIterable<CustomerRecord> recoveredCustomerRecords = BankCosmosDb.containerIdentity
                 .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
                         CustomerRecord.class);
+
         recoveredCustomerRecords
                 .forEach(customerRecord -> new Customer(customerRecord.getId(),
                         customerRecord.getPassword()));
@@ -155,7 +138,7 @@ public class BankCosmosDb {
      * Starts with mockup
      *
      */
-    void loadBankAccounts() {
+    public static void loadBankAccounts() {
 
         // nothing yet
     }

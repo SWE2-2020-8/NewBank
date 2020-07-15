@@ -12,14 +12,9 @@ public class NewBank {
     private static final NewBank bank = new NewBank(); // Creating the singleton
 
     /**
-     * Private NewBank constructor
-     * 
-     * Loads the bank customers
+     * Private NewBank constructor to prevent instantiation of additional banks
      */
     private NewBank() {
-        BankCosmosDb newBankDatabase = new BankCosmosDb();
-        newBankDatabase.loadBankCustomers();
-        newBankDatabase.loadBankAccounts();
     }
 
     /**
@@ -162,11 +157,8 @@ public class NewBank {
                 && customer.getUserName().equals("Admin")
                 && !Customer.getAllCustomersMap().containsKey(userName)) {
 
-            BankCosmosDb testDb = new BankCosmosDb();
-            testDb.retrieveOrCreateDatabase(BankCosmosDb.DATABASE_NAME);
-            testDb.retrieveOrCreateContainer(BankCosmosDb.CONTAINER_ACCOUNTS,
-                    "/id");
-            testDb.createCustomerDocument(new Customer(userName, password));
+            BankCosmosDb
+                    .createCustomerDocument(new Customer(userName, password));
 
             printTrace(customer, "User added " + userName);
             return NewBank.SUCCESS;
