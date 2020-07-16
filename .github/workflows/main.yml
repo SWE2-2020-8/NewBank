@@ -1,0 +1,53 @@
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "client/**"
+      - "server/target/**"
+      - "server/test/**"
+      - "README.md"
+      - "server/README.md"
+      - ".gitignore"
+
+name: NewBankServer_to_Azure
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # checkout the repo
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+
+      - name: "Login via Azure CLI"
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "Build and push image"
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          cd server
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
+
+      - name: "Deploy to Azure Container Instances"
+        uses: "azure/aci-deploy@v1"
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: ${{ github.repository_owner }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
+          registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: bankserver
+          #azure-file-volume-share-name: ${{ secrets.AZ_STORAGE_SHARE_NAME }}
+          #azure-file-volume-account-name: ${{ secrets.AZ_STORAGE_ACCOUNT_NAME }}
+          #azure-file-volume-account-key: ${{ secrets.AZ_STORAGE_ACCOUNT_KEY }}
+          #azure-file-volume-mount-path: /mnt/volume
+          location: "southeastasia"

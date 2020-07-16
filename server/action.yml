@@ -1,5 +1,0 @@
-name: "NewBankServerContainer"
-description: "Make a container that executes a jar with the bank server"
-runs:
-  using: "docker"
-  image: "Dockerfile"
