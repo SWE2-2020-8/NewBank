@@ -122,4 +122,3 @@ public class NewBankClientHandler extends Thread {
                 + " " + message);
     }
 }
-

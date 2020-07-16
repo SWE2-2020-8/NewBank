@@ -3,11 +3,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*
- * Customer class
- * 
- * Keeps track of all the customers and their information
- */
 public class Customer {
 
     private static Map<String, Customer> allCustomersMap = new HashMap<>();
@@ -75,6 +70,7 @@ public class Customer {
      * 
      */
     public String getUserName() {
+
         return this.userName;
     }
 
@@ -93,6 +89,7 @@ public class Customer {
      * @param password
      */
     boolean isPasswordOK(String password) {
+
         return this.password.equals(password);
     }
 
@@ -100,6 +97,7 @@ public class Customer {
      * Get the accounts from the user
      */
     public List<Account> getAccounts() {
+
         return this.accounts;
     }
 
@@ -107,6 +105,7 @@ public class Customer {
      * Add list of accounts to a user
      */
     public void addAccounts(List<Account> accounts) {
+
         this.accounts.addAll(accounts);
     }
 
@@ -130,6 +129,7 @@ public class Customer {
      * To change the password
      */
     public void setPassword(String password) {
+
         this.password = password;
     }
 
@@ -151,6 +151,7 @@ public class Customer {
 
         for (Account a : this.accounts)
             s.append(a.toString() + "\n");
+
         return s.toString();
     }
 
