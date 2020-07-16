@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -47,18 +50,25 @@ public class BankCosmosDb {
                 .consistencyLevel(ConsistencyLevel.EVENTUAL)
                 .contentResponseOnWriteEnabled(true)
                 .buildClient();
+        printTrace("Init OK " + BankCosmosDb.client.toString());
 
         BankCosmosDb.database = BankCosmosDb.client
                 .getDatabase(BankCosmosDb.DATABASE_NAME);
+        printTrace("Init OK " + BankCosmosDb.database.getId());
 
         BankCosmosDb.containerIdentity = BankCosmosDb.database
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
+        printTrace("Init OK " + BankCosmosDb.containerIdentity.getId());
     }
 
-    /*
-     * Hidden constructor
-     */
+    // Hidden constructor
     private BankCosmosDb() {
+    }
+
+    // Container identity getter
+    public static CosmosContainer getContainerIdentity() {
+        printTrace("Identity container given away");
+        return containerIdentity;
     }
 
     // Database retrieve or create
@@ -108,12 +118,13 @@ public class BankCosmosDb {
     }
 
     // Create a customer document in container
-    public static void createCustomerDocument(Customer customer) {
+    public static void createCustomerDocument(final Customer customer) {
 
-        CustomerRecord customerRecord = new CustomerRecord();
+        final CustomerRecord customerRecord = new CustomerRecord();
         customerRecord.setId(customer.getUserName());
         customerRecord.setPassword(customer.getPassword());
         BankCosmosDb.containerIdentity.createItem(customerRecord);
+        printTrace("Created identity " + customerRecord);
     }
 
     /*
@@ -127,11 +138,18 @@ public class BankCosmosDb {
      */
     public static void loadBankCustomers() {
 
-        BankCosmosDb.containerIdentity
+        final List<CustomerRecord> retrieved = BankCosmosDb
+                .getContainerIdentity()
                 .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
                         CustomerRecord.class)
-                .forEach(customerRecord -> new Customer(customerRecord.getId(),
-                        customerRecord.getPassword()));
+                .stream()
+                .collect(Collectors.toList());
+
+        retrieved.forEach(customerRecord -> new Customer(customerRecord.getId(),
+                customerRecord.getPassword()));
+
+        retrieved.forEach(cr -> printTrace(
+                "Retrieved <" + cr.getId() + "/" + cr.getPassword() + ">"));
     }
 
     /*
@@ -145,6 +163,14 @@ public class BankCosmosDb {
     public static void loadBankAccounts() {
 
         // nothing yet
+    }
+
+    /*
+     * Auxiliary trace method to print in the console to correct errors
+     */
+    private static void printTrace(final String message) {
+
+        System.err.println(BankCosmosDb.class.getName() + ": " + message);
     }
 
 }

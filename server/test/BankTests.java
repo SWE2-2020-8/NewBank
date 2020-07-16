@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.azure.cosmos.models.CosmosContainerProperties;
+import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
 import org.junit.Ignore;
@@ -22,10 +23,16 @@ public class BankTests {
     @Test
     public void loadBankCustomersTest() {
 
-        BankCosmosDb.loadBankCustomers();
+        List<CustomerRecord> retrieved = BankCosmosDb.getContainerIdentity()
+                .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
+                        CustomerRecord.class)
+                .stream()
+                .collect(Collectors.toList());
 
-        System.err.println(Customer.getAllCustomersMap());
-        assertTrue(Customer.getAllCustomersMap().size() > 0);
+        retrieved.forEach(
+                cr -> System.err.println(cr.getId() + "/" + cr.getPassword()));
+
+        assertTrue(retrieved.size() > 0);
     }
 
     @Ignore("Only used to reset the user database")
@@ -35,7 +42,6 @@ public class BankTests {
         BankCosmosDb.deleteDatabase();
         BankCosmosDb.retrieveOrCreateDatabase();
         BankCosmosDb.retrieveOrCreateContainerIdentity();
-        BankCosmosDb.loadBankCustomers();
 
         BankCosmosDb.createCustomerDocument(new Customer("Admin", "1234"));
         BankCosmosDb.createCustomerDocument(
