@@ -93,6 +93,10 @@ public class BankTests {
 
         BankCosmosDb.loadBankCustomers();
         BankCosmosDb.loadBankAccounts();
-        assertTrue(true);
+
+        // Assumes there's a customer named Christina and that she has accounts
+        assertNotNull(Customer.getCustomerByUserName("Christina"));
+        assertNotNull(
+                Customer.getCustomerByUserName("Christina").getAccounts());
     }
 }

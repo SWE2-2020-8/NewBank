@@ -77,6 +77,9 @@ public class NewBank {
         case "PAY":
             return NewBank.FAIL;
 
+        case "CHANGEPASSWORD":
+            return changePassword(customer, param1, param2);
+
         case "ADDUSER": // created this so customer can call new account
             return addUser(customer, param1, param2);
 
@@ -137,11 +140,34 @@ public class NewBank {
     private String newAccount(Customer customer, String accountName) {
 
         if (accountName.length() > 3) {
-            customer.addAccount(accountName, 0.0);
+
+            BankCosmosDb.createAccountDocument(
+                    customer.addAccount(accountName, 0.0));
             printTrace(customer, "Account added " + accountName);
             return NewBank.SUCCESS;
+
         } else {
             printTrace(customer, "Account not added");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * Change user's password
+     * 
+     */
+    private String changePassword(Customer customer, String oldPass,
+            String newPass) {
+
+        if (customer.getPassword().equals(oldPass)) {
+
+            customer.setPassword(newPass);
+            BankCosmosDb.replaceCustomerDocument(customer);
+            printTrace(customer, "Password changed");
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Password not changed");
             return NewBank.FAIL;
         }
     }

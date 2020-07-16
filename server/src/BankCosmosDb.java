@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +11,10 @@ import com.azure.cosmos.CosmosDatabase;
 import com.azure.cosmos.models.CosmosContainerProperties;
 import com.azure.cosmos.models.CosmosDatabaseRequestOptions;
 import com.azure.cosmos.models.CosmosDatabaseResponse;
+import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
 public class BankCosmosDb {
@@ -135,8 +139,25 @@ public class BankCosmosDb {
         final CustomerRecord customerRecord = new CustomerRecord();
         customerRecord.setId(customer.getUserName());
         customerRecord.setPassword(customer.getPassword());
+
         BankCosmosDb.containerIdentity.createItem(customerRecord);
         printTrace("Created identity " + customerRecord);
+    }
+
+    // Replace a customer document in container
+    public static void replaceCustomerDocument(final Customer customer) {
+
+        final CustomerRecord customerRecord = new CustomerRecord();
+        customerRecord.setId(customer.getUserName());
+        customerRecord.setPassword(customer.getPassword());
+
+        CosmosItemResponse<CustomerRecord> customerResponse = containerIdentity
+                .replaceItem(customerRecord, customerRecord.getId(),
+                        new PartitionKey(customerRecord.getId()),
+                        new CosmosItemRequestOptions());
+
+        printTrace("Identity change response code: "
+                + customerResponse.getStatusCode());
     }
 
     // Create an account document in container
@@ -147,8 +168,21 @@ public class BankCosmosDb {
         accountRecord.setAccountName(account.getAccountName());
         accountRecord.setUserName(account.getUserName());
         accountRecord.setBalance(account.getBalance());
-        TransactionRecord[] transactions = {};
-        accountRecord.setTransactions(transactions);
+
+        List<TransactionRecord> transactionRecordList = new ArrayList<>();
+        account.getTransactions().forEach(transaction -> {
+
+            TransactionRecord transactionRecord = new TransactionRecord();
+            transactionRecord.setDate(transaction.date);
+            transactionRecord.setAmount(transaction.amount);
+            transactionRecord.setBalance(transaction.balance);
+            transactionRecord.setDate(transaction.date);
+            transactionRecordList.add(transactionRecord);
+        });
+
+        accountRecord.setTransactions(transactionRecordList
+                .toArray(new TransactionRecord[transactionRecordList.size()]));
+
         BankCosmosDb.containerAccounts.createItem(accountRecord);
         printTrace("Created account " + accountRecord);
     }
