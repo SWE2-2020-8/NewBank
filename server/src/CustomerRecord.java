@@ -1,4 +1,13 @@
+/*
+ * CustomerRecord class
+ * 
+ * CosmosDB use
+ * 
+ * This class is only to work with the database documents, do not modify
+ */
+
 public class CustomerRecord {
+
     private String id;
     private String password;
 

@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class BankCosmosDb {
     private static CosmosClient client;
     private static CosmosDatabase database;
     private static CosmosContainer containerIdentity;
-    // private static CosmosContainer containerAccounts;
+    private static CosmosContainer containerAccounts;
 
     /*
      * Initialisation
@@ -59,6 +60,11 @@ public class BankCosmosDb {
         BankCosmosDb.containerIdentity = BankCosmosDb.database
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
         printTrace("Init OK " + BankCosmosDb.containerIdentity.getId());
+
+        BankCosmosDb.containerAccounts = BankCosmosDb.database
+                .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
+        printTrace("Init OK " + BankCosmosDb.containerAccounts.getId());
+
     }
 
     // Hidden constructor
@@ -69,6 +75,12 @@ public class BankCosmosDb {
     public static CosmosContainer getContainerIdentity() {
         printTrace("Identity container given away");
         return containerIdentity;
+    }
+
+    // Container account getter
+    public static CosmosContainer getContainerAccounts() {
+        printTrace("Account container given away");
+        return containerAccounts;
     }
 
     // Database retrieve or create
@@ -102,14 +114,14 @@ public class BankCosmosDb {
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    // public static void retrieveOrCreateContainerAccounts() {
+    public static void retrieveOrCreateContainerAccounts() {
 
-    // BankCosmosDb.database.createContainerIfNotExists(
-    // new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
-    // "/id"));
-    // BankCosmosDb.containerAccounts = BankCosmosDb.database
-    // .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
-    // }
+        BankCosmosDb.database.createContainerIfNotExists(
+                new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
+                        "/id"));
+        BankCosmosDb.containerAccounts = BankCosmosDb.database
+                .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
+    }
 
     // Container read all
     public static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
@@ -125,6 +137,20 @@ public class BankCosmosDb {
         customerRecord.setPassword(customer.getPassword());
         BankCosmosDb.containerIdentity.createItem(customerRecord);
         printTrace("Created identity " + customerRecord);
+    }
+
+    // Create an account document in container
+    public static void createAccountDocument(final Account account) {
+
+        final AccountRecord accountRecord = new AccountRecord();
+        accountRecord.setId(account.getAccountId());
+        accountRecord.setAccountName(account.getAccountName());
+        accountRecord.setUserName(account.getUserName());
+        accountRecord.setBalance(account.getBalance());
+        TransactionRecord[] transactions = {};
+        accountRecord.setTransactions(transactions);
+        BankCosmosDb.containerAccounts.createItem(accountRecord);
+        printTrace("Created account " + accountRecord);
     }
 
     /*
@@ -162,7 +188,32 @@ public class BankCosmosDb {
      */
     public static void loadBankAccounts() {
 
-        // nothing yet
+        final List<AccountRecord> retrieved = BankCosmosDb
+                .getContainerAccounts()
+                .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
+                        AccountRecord.class)
+                .stream()
+                .collect(Collectors.toList());
+
+        retrieved.forEach(accountRecord -> {
+
+            Customer owner = Customer
+                    .getCustomerByUserName(accountRecord.getUserName());
+
+            Account account = new Account(accountRecord.getUserName(),
+                    accountRecord.getAccountName());
+
+            Arrays.stream(accountRecord.getTransactions())
+                    .forEach(transaction -> account.addTransaction(
+                            new Account.Transaction(transaction.getAmount(),
+                                    transaction.getBalance(),
+                                    transaction.getDescription(),
+                                    transaction.getDate())));
+
+            owner.addAccount(account);
+            printTrace("Retrieved <" + account.getUserName() + "/"
+                    + account.getAccountName() + ">");
+        });
     }
 
     /*

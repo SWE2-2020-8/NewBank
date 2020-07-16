@@ -2,6 +2,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.azure.cosmos.models.CosmosContainerProperties;
@@ -42,14 +43,12 @@ public class BankTests {
         BankCosmosDb.deleteDatabase();
         BankCosmosDb.retrieveOrCreateDatabase();
         BankCosmosDb.retrieveOrCreateContainerIdentity();
+        BankCosmosDb.retrieveOrCreateContainerAccounts();
 
         BankCosmosDb.createCustomerDocument(new Customer("Admin", "1234"));
-        BankCosmosDb.createCustomerDocument(
-                new Customer("Bhagy", "hi").addAccount("Main", 1000.0));
-        BankCosmosDb.createCustomerDocument(
-                new Customer("Christina", "lol").addAccount("Savings", 1500.0));
-        BankCosmosDb.createCustomerDocument(
-                new Customer("John", "nhoj").addAccount("Checking", 250.0));
+        BankCosmosDb.createCustomerDocument(new Customer("Bhagy", "hi"));
+        BankCosmosDb.createCustomerDocument(new Customer("Christina", "lol"));
+        BankCosmosDb.createCustomerDocument(new Customer("John", "nhoj"));
 
         assertTrue(Customer.getAllCustomersMap().size() > 0);
     }
@@ -70,4 +69,30 @@ public class BankTests {
         assertTrue(listIds.contains(BankCosmosDb.CONTAINER_IDENTITY));
     }
 
+    @Test
+    public void addRandomAccountToRandomCustomerTest() {
+
+        Random random = new Random();
+
+        BankCosmosDb.loadBankCustomers();
+        Object[] arrayCust = Customer.getAllCustomersMap().values().toArray();
+        Customer chosenCustomer = (Customer) arrayCust[random
+                .nextInt(arrayCust.length)];
+        System.err.println("Found " + chosenCustomer.getUserName());
+
+        Account newAccount = chosenCustomer.addAccount(
+                "Testaccount" + random.nextInt(9999), +random.nextInt(9999));
+
+        BankCosmosDb.createAccountDocument(newAccount);
+
+        assertTrue(chosenCustomer.getAccounts().contains(newAccount));
+    }
+
+    @Test
+    public void loadUsersAndAccountsTest() {
+
+        BankCosmosDb.loadBankCustomers();
+        BankCosmosDb.loadBankAccounts();
+        assertTrue(true);
+    }
 }
