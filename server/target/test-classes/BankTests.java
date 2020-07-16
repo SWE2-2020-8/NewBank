@@ -22,9 +22,6 @@ public class BankTests {
     @Test
     public void loadBankCustomersTest() {
 
-        BankCosmosDb.initClientBankCosmosDb();
-        BankCosmosDb.retrieveDatabase();
-        BankCosmosDb.retrieveContainerIdentity();
         BankCosmosDb.loadBankCustomers();
 
         System.err.println(Customer.getAllCustomersMap());
@@ -35,10 +32,9 @@ public class BankTests {
     @Test
     public void resetBankCustomers() {
 
-        BankCosmosDb.initClientBankCosmosDb();
         BankCosmosDb.deleteDatabase();
-        BankCosmosDb.retrieveDatabase();
-        BankCosmosDb.retrieveContainerIdentity();
+        BankCosmosDb.retrieveOrCreateDatabase();
+        BankCosmosDb.retrieveOrCreateContainerIdentity();
         BankCosmosDb.loadBankCustomers();
 
         BankCosmosDb.createCustomerDocument(new Customer("Admin", "1234"));
@@ -55,8 +51,6 @@ public class BankTests {
     @Test
     public void containersExistTest() {
 
-        BankCosmosDb.initClientBankCosmosDb();
-        BankCosmosDb.retrieveDatabase();
         CosmosPagedIterable<CosmosContainerProperties> listContainers = BankCosmosDb
                 .retrieveAllContainers();
 

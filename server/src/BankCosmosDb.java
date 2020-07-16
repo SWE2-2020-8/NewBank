@@ -34,18 +34,12 @@ public class BankCosmosDb {
     private static CosmosClient client;
     private static CosmosDatabase database;
     private static CosmosContainer containerIdentity;
-    private static CosmosContainer containerAccounts;
+    // private static CosmosContainer containerAccounts;
 
     /*
-     * Constructor
+     * Initialisation
      */
-    private BankCosmosDb() {
-    }
-
-    /*
-     * Static methods
-     */
-    public static void initClientBankCosmosDb() {
+    static {
 
         BankCosmosDb.client = new CosmosClientBuilder()
                 .endpoint(BankCosmosDb.HOST)
@@ -53,10 +47,22 @@ public class BankCosmosDb {
                 .consistencyLevel(ConsistencyLevel.EVENTUAL)
                 .contentResponseOnWriteEnabled(true)
                 .buildClient();
+
+        BankCosmosDb.database = BankCosmosDb.client
+                .getDatabase(BankCosmosDb.DATABASE_NAME);
+
+        BankCosmosDb.containerIdentity = BankCosmosDb.database
+                .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    // Database retrieve
-    public static void retrieveDatabase() {
+    /*
+     * Hidden constructor
+     */
+    private BankCosmosDb() {
+    }
+
+    // Database retrieve or create
+    public static void retrieveOrCreateDatabase() {
 
         BankCosmosDb.client
                 .createDatabaseIfNotExists(BankCosmosDb.DATABASE_NAME);
@@ -76,8 +82,8 @@ public class BankCosmosDb {
                 + dbResp.getStatusCode());
     }
 
-    // Container retrieve
-    public static void retrieveContainerIdentity() {
+    // Container retrieve or create
+    public static void retrieveOrCreateContainerIdentity() {
 
         BankCosmosDb.database.createContainerIfNotExists(
                 new CosmosContainerProperties(BankCosmosDb.CONTAINER_IDENTITY,
@@ -86,14 +92,14 @@ public class BankCosmosDb {
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    public static void retrieveContainerAccounts() {
+    // public static void retrieveOrCreateContainerAccounts() {
 
-        BankCosmosDb.database.createContainerIfNotExists(
-                new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
-                        "/id"));
-        BankCosmosDb.containerAccounts = BankCosmosDb.database
-                .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
-    }
+    // BankCosmosDb.database.createContainerIfNotExists(
+    // new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
+    // "/id"));
+    // BankCosmosDb.containerAccounts = BankCosmosDb.database
+    // .getContainer(BankCosmosDb.CONTAINER_ACCOUNTS);
+    // }
 
     // Container read all
     public static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
@@ -121,11 +127,9 @@ public class BankCosmosDb {
      */
     public static void loadBankCustomers() {
 
-        CosmosPagedIterable<CustomerRecord> recoveredCustomerRecords = BankCosmosDb.containerIdentity
+        BankCosmosDb.containerIdentity
                 .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
-                        CustomerRecord.class);
-
-        recoveredCustomerRecords
+                        CustomerRecord.class)
                 .forEach(customerRecord -> new Customer(customerRecord.getId(),
                         customerRecord.getPassword()));
     }

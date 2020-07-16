@@ -44,13 +44,10 @@ public class NewBankServer extends Thread {
                  * Loops back once gives the connection to the handler and
                  * awaits the next connection request into the server socket
                  */
-                Socket s = server.accept();
-
+                Socket socket = server.accept();
                 printTrace("NEW CONNECTION CREATED, SENDING TO HANDLER");
-
-                NewBankClientHandler clientHandler = new NewBankClientHandler(
-                        s);
-                clientHandler.start();
+                NewBankClientHandler handler = new NewBankClientHandler(socket);
+                handler.start();
 
             }
         } catch (IOException e) {
@@ -59,16 +56,15 @@ public class NewBankServer extends Thread {
             e.printStackTrace();
 
         } finally {
+
             try {
                 // Close and good bye
-                System.err.println(
-                        this.getClass().getName() + ": CLOSING THE SERVER");
+                printTrace("CLOSING THE SERVER");
                 server.close();
 
             } catch (IOException e) {
                 // Couldn't even close!
                 printTrace("COULD NOT CLOSE THE SERVER");
-                e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
         }
@@ -96,9 +92,6 @@ public class NewBankServer extends Thread {
         /*
          * Connects to the Azure database and loads users
          */
-        BankCosmosDb.initClientBankCosmosDb();
-        BankCosmosDb.retrieveDatabase();
-        BankCosmosDb.retrieveContainerIdentity();
         BankCosmosDb.loadBankCustomers();
         /*
          * starts a new NewBankServer thread on a specified port number
