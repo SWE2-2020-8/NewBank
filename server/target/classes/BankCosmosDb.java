@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -210,6 +209,7 @@ public class BankCosmosDb {
 
         retrieved.forEach(cr -> printTrace(
                 "Retrieved <" + cr.getId() + "/" + cr.getPassword() + ">"));
+
     }
 
     /*
