@@ -7,10 +7,10 @@ public class Account {
 
     static class Transaction {
 
-        String date;
         double amount;
         double balance;
         String description;
+        String date;
 
         Transaction(double amount, double balance, String description) {
 
@@ -22,10 +22,17 @@ public class Account {
         Transaction(double amount, double balance, String description,
                 String date) {
 
-            this.date = date;
             this.amount = amount;
             this.balance = balance;
             this.description = description;
+            this.date = date;
+        }
+
+        @Override
+        public String toString() {
+
+            return "<" + this.amount + "#" + this.balance + "#"
+                    + this.description + "#" + this.date + ">";
         }
     }
 
@@ -82,7 +89,7 @@ public class Account {
     @Override
     public String toString() {
 
-        return "<" + this.userName + "/" + this.accountName + "/"
+        return "<" + this.userName + "#" + this.accountName + "#"
                 + this.transactions + ">";
     }
 }

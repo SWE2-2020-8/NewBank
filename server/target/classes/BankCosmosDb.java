@@ -155,7 +155,7 @@ public class BankCosmosDb {
                         new PartitionKey(customerRecord.getId()),
                         new CosmosItemRequestOptions());
 
-        printTrace("Identity change response code: "
+        printTrace("Identity document replace response code: "
                 + customerResponse.getStatusCode());
     }
 
@@ -175,7 +175,7 @@ public class BankCosmosDb {
             transactionRecord.setDate(transaction.date);
             transactionRecord.setAmount(transaction.amount);
             transactionRecord.setBalance(transaction.balance);
-            transactionRecord.setDate(transaction.date);
+            transactionRecord.setDescription(transaction.description);
             transactionRecordList.add(transactionRecord);
         });
 
@@ -184,6 +184,38 @@ public class BankCosmosDb {
 
         BankCosmosDb.containerAccounts.createItem(accountRecord);
         printTrace("Created account " + accountRecord);
+    }
+
+    // Replace an account document in container
+    public static void replaceAccountDocument(final Account account) {
+
+        final AccountRecord accountRecord = new AccountRecord();
+        accountRecord.setId(account.getAccountId());
+        accountRecord.setAccountName(account.getAccountName());
+        accountRecord.setUserName(account.getUserName());
+        accountRecord.setBalance(account.getBalance());
+
+        List<TransactionRecord> transactionRecordList = new ArrayList<>();
+        account.getTransactions().forEach(transaction -> {
+
+            TransactionRecord transactionRecord = new TransactionRecord();
+            transactionRecord.setDate(transaction.date);
+            transactionRecord.setAmount(transaction.amount);
+            transactionRecord.setBalance(transaction.balance);
+            transactionRecord.setDescription(transaction.description);
+            transactionRecordList.add(transactionRecord);
+        });
+
+        accountRecord.setTransactions(transactionRecordList
+                .toArray(new TransactionRecord[transactionRecordList.size()]));
+
+        CosmosItemResponse<AccountRecord> customerResponse = containerAccounts
+                .replaceItem(accountRecord, accountRecord.getId(),
+                        new PartitionKey(accountRecord.getId()),
+                        new CosmosItemRequestOptions());
+
+        printTrace("Account document replace response code: "
+                + customerResponse.getStatusCode());
     }
 
     /*
@@ -204,12 +236,9 @@ public class BankCosmosDb {
                 .stream()
                 .collect(Collectors.toList());
 
-        retrieved.forEach(customerRecord -> new Customer(customerRecord.getId(),
-                customerRecord.getPassword()));
-
-        retrieved.forEach(cr -> printTrace(
-                "Retrieved <" + cr.getId() + "/" + cr.getPassword() + ">"));
-
+        retrieved.forEach(customerRecord -> printTrace(
+                "Retrieved " + new Customer(customerRecord.getId(),
+                        customerRecord.getPassword()).toString()));
     }
 
     /*
@@ -245,8 +274,7 @@ public class BankCosmosDb {
                                     transaction.getDate())));
 
             owner.addAccount(account);
-            printTrace("Retrieved <" + account.getUserName() + "/"
-                    + account.getAccountName() + ">");
+            printTrace("Retrieved " + account.toString());
         });
     }
 
