@@ -1,3 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "MAVEN_CONFIG", // variable name
+            "value": "."
+        }
+    ]
 }
