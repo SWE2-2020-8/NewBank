@@ -11,9 +11,9 @@ RUN mvn clean package
 FROM openjdk:8-jre-alpine3.9
 
 # copy only the artifacts we need from the first stage and discard the rest
-COPY --from=MAVEN_BUILD /target/newbankserver-1.0-SNAPSHOT.jar /target/newbankserver-1.0-SNAPSHOT.jar
+COPY --from=MAVEN_BUILD /target/newbankserver-1.0-SNAPSHOT-jar-with-dependencies.jar /target/newbankserver-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 # set the startup command to execute the jar
-CMD ["java", "-jar", "target/newbankserver-1.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/newbankserver-1.0-SNAPSHOT-jar-with-dependencies.jar"]
 
-# port is in 14002
+# port is in 14002 -> moved to 80
