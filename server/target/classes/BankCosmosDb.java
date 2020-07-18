@@ -36,8 +36,12 @@ public class BankCosmosDb {
     private static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
     private static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
     private static final String DATABASE_NAME = "newBank";
-    static final String CONTAINER_IDENTITY = "Identity";
-    static final String CONTAINER_ACCOUNTS = "Accounts";
+    static final String CONTAINER_IDENTITY = "Identity"; // (default access
+                                                         // modifier for test
+                                                         // use only)
+    static final String CONTAINER_ACCOUNTS = "Accounts";// (default access
+                                                        // modifier for test use
+                                                        // only)
     private static CosmosClient client;
     private static CosmosDatabase database;
     private static CosmosContainer containerIdentity;
@@ -75,19 +79,22 @@ public class BankCosmosDb {
     }
 
     // Container identity getter
-    public static CosmosContainer getContainerIdentity() {
+    // (default access modifier for test use only)
+    static CosmosContainer getContainerIdentity() {
         printTrace("Identity container given away");
         return containerIdentity;
     }
 
     // Container account getter
-    public static CosmosContainer getContainerAccounts() {
+    // (default access modifier for test use only)
+    static CosmosContainer getContainerAccounts() {
         printTrace("Account container given away");
         return containerAccounts;
     }
 
     // Database retrieve or create
-    public static void retrieveOrCreateDatabase() {
+    // (default access modifier for test use only)
+    static void retrieveOrCreateDatabase() {
 
         BankCosmosDb.client
                 .createDatabaseIfNotExists(BankCosmosDb.DATABASE_NAME);
@@ -96,7 +103,8 @@ public class BankCosmosDb {
     }
 
     // Database delete
-    public static void deleteDatabase() {
+    // (default access modifier for test use only)
+    static void deleteDatabase() {
 
         final CosmosDatabaseResponse dbResp = client
                 .getDatabase(BankCosmosDb.DATABASE_NAME)
@@ -108,7 +116,8 @@ public class BankCosmosDb {
     }
 
     // Container retrieve or create
-    public static void retrieveOrCreateContainerIdentity() {
+    // (default access modifier for test use only)
+    static void retrieveOrCreateContainerIdentity() {
 
         BankCosmosDb.database.createContainerIfNotExists(
                 new CosmosContainerProperties(BankCosmosDb.CONTAINER_IDENTITY,
@@ -117,7 +126,9 @@ public class BankCosmosDb {
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    public static void retrieveOrCreateContainerAccounts() {
+    // Container retrieve or create
+    // (default access modifier for test use only)
+    static void retrieveOrCreateContainerAccounts() {
 
         BankCosmosDb.database.createContainerIfNotExists(
                 new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
@@ -127,12 +138,17 @@ public class BankCosmosDb {
     }
 
     // Container read all
-    public static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
+    // (default access modifier for test use only)
+    static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
 
         return BankCosmosDb.database.readAllContainers();
     }
 
-    // Create a customer document in container
+    /*
+     * Create a customer document in container
+     * 
+     * Public method to update database
+     */
     public static void createCustomerDocument(final Customer customer) {
 
         final CustomerRecord customerRecord = new CustomerRecord();
@@ -143,7 +159,11 @@ public class BankCosmosDb {
         printTrace("Created identity " + customerRecord);
     }
 
-    // Replace a customer document in container
+    /*
+     * Replace a customer document in container
+     * 
+     * Public method to update database
+     */
     public static void replaceCustomerDocument(final Customer customer) {
 
         final CustomerRecord customerRecord = new CustomerRecord();
@@ -159,7 +179,11 @@ public class BankCosmosDb {
                 + customerResponse.getStatusCode());
     }
 
-    // Create an account document in container
+    /*
+     * Create an account document in container
+     * 
+     * Public method to update database
+     */
     public static void createAccountDocument(final Account account) {
 
         final AccountRecord accountRecord = new AccountRecord();
@@ -186,7 +210,11 @@ public class BankCosmosDb {
         printTrace("Created account " + accountRecord);
     }
 
-    // Replace an account document in container
+    /*
+     * Replace an account document in container
+     * 
+     * Public method to update database
+     */
     public static void replaceAccountDocument(final Account account) {
 
         final AccountRecord accountRecord = new AccountRecord();
@@ -229,16 +257,12 @@ public class BankCosmosDb {
      */
     public static void loadBankCustomers() {
 
-        final List<CustomerRecord> retrieved = BankCosmosDb
-                .getContainerIdentity()
+        BankCosmosDb.containerIdentity
                 .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
                         CustomerRecord.class)
-                .stream()
-                .collect(Collectors.toList());
-
-        retrieved.forEach(customerRecord -> printTrace(
-                "Retrieved " + new Customer(customerRecord.getId(),
-                        customerRecord.getPassword()).toString()));
+                .forEach(customerRecord -> printTrace(
+                        "Retrieved " + new Customer(customerRecord.getId(),
+                                customerRecord.getPassword()).toString()));
     }
 
     /*
@@ -251,31 +275,28 @@ public class BankCosmosDb {
      */
     public static void loadBankAccounts() {
 
-        final List<AccountRecord> retrieved = BankCosmosDb
-                .getContainerAccounts()
+        BankCosmosDb.containerAccounts
                 .queryItems("SELECT * FROM c", new CosmosQueryRequestOptions(),
                         AccountRecord.class)
-                .stream()
-                .collect(Collectors.toList());
+                .forEach(accountRecord -> {
 
-        retrieved.forEach(accountRecord -> {
+                    Customer owner = Customer
+                            .getCustomerByName(accountRecord.getUserName());
 
-            Customer owner = Customer
-                    .getCustomerByName(accountRecord.getUserName());
+                    Account account = new Account(accountRecord.getUserName(),
+                            accountRecord.getAccountName());
 
-            Account account = new Account(accountRecord.getUserName(),
-                    accountRecord.getAccountName());
+                    Arrays.stream(accountRecord.getTransactions())
+                            .forEach(transaction -> account
+                                    .addTransaction(new Account.Transaction(
+                                            transaction.getAmount(),
+                                            transaction.getBalance(),
+                                            transaction.getDescription(),
+                                            transaction.getDate())));
 
-            Arrays.stream(accountRecord.getTransactions())
-                    .forEach(transaction -> account.addTransaction(
-                            new Account.Transaction(transaction.getAmount(),
-                                    transaction.getBalance(),
-                                    transaction.getDescription(),
-                                    transaction.getDate())));
-
-            owner.addAccount(account);
-            printTrace("Retrieved " + account.toString());
-        });
+                    owner.addAccount(account);
+                    printTrace("Retrieved " + account.toString());
+                });
     }
 
     /*
