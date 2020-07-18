@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -36,12 +37,14 @@ public class BankCosmosDb {
     private static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
     private static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
     private static final String DATABASE_NAME = "newBank";
-    static final String CONTAINER_IDENTITY = "Identity";
-    static final String CONTAINER_ACCOUNTS = "Accounts";
     private static CosmosClient client;
     private static CosmosDatabase database;
     private static CosmosContainer containerIdentity;
     private static CosmosContainer containerAccounts;
+
+    // Default visibility for testing only
+    static final String CONTAINER_IDENTITY = "Identity";
+    static final String CONTAINER_ACCOUNTS = "Accounts";
 
     /*
      * Initialisation
@@ -75,19 +78,23 @@ public class BankCosmosDb {
     }
 
     // Container identity getter
-    public static CosmosContainer getContainerIdentity() {
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static CosmosContainer getContainerIdentity() {
         printTrace("Identity container given away");
         return containerIdentity;
     }
 
     // Container account getter
-    public static CosmosContainer getContainerAccounts() {
+    private static CosmosContainer getContainerAccounts() {
         printTrace("Account container given away");
         return containerAccounts;
     }
 
     // Database retrieve or create
-    public static void retrieveOrCreateDatabase() {
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static void retrieveOrCreateDatabase() {
 
         BankCosmosDb.client
                 .createDatabaseIfNotExists(BankCosmosDb.DATABASE_NAME);
@@ -96,7 +103,9 @@ public class BankCosmosDb {
     }
 
     // Database delete
-    public static void deleteDatabase() {
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static void deleteDatabase() {
 
         final CosmosDatabaseResponse dbResp = client
                 .getDatabase(BankCosmosDb.DATABASE_NAME)
@@ -108,7 +117,9 @@ public class BankCosmosDb {
     }
 
     // Container retrieve or create
-    public static void retrieveOrCreateContainerIdentity() {
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static void retrieveOrCreateContainerIdentity() {
 
         BankCosmosDb.database.createContainerIfNotExists(
                 new CosmosContainerProperties(BankCosmosDb.CONTAINER_IDENTITY,
@@ -117,7 +128,10 @@ public class BankCosmosDb {
                 .getContainer(BankCosmosDb.CONTAINER_IDENTITY);
     }
 
-    public static void retrieveOrCreateContainerAccounts() {
+    // Container retrieve or create
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static void retrieveOrCreateContainerAccounts() {
 
         BankCosmosDb.database.createContainerIfNotExists(
                 new CosmosContainerProperties(BankCosmosDb.CONTAINER_ACCOUNTS,
@@ -127,12 +141,17 @@ public class BankCosmosDb {
     }
 
     // Container read all
-    public static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
+    // Only intended to be visible to testing method, do not use outside of this
+    // class
+    static CosmosPagedIterable<CosmosContainerProperties> retrieveAllContainers() {
 
         return BankCosmosDb.database.readAllContainers();
     }
 
-    // Create a customer document in container
+    /*
+     * Create a customer document in container
+     * 
+     */
     public static void createCustomerDocument(final Customer customer) {
 
         final CustomerRecord customerRecord = new CustomerRecord();
@@ -143,7 +162,10 @@ public class BankCosmosDb {
         printTrace("Created identity " + customerRecord);
     }
 
-    // Replace a customer document in container
+    /*
+     * Replace a customer document in container
+     * 
+     */
     public static void replaceCustomerDocument(final Customer customer) {
 
         final CustomerRecord customerRecord = new CustomerRecord();
@@ -159,7 +181,10 @@ public class BankCosmosDb {
                 + customerResponse.getStatusCode());
     }
 
-    // Create an account document in container
+    /*
+     * Create an account document in container
+     * 
+     */
     public static void createAccountDocument(final Account account) {
 
         final AccountRecord accountRecord = new AccountRecord();
