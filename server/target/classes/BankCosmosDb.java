@@ -172,10 +172,10 @@ public class BankCosmosDb {
         account.getTransactions().forEach(transaction -> {
 
             TransactionRecord transactionRecord = new TransactionRecord();
-            transactionRecord.setDate(transaction.date);
-            transactionRecord.setAmount(transaction.amount);
-            transactionRecord.setBalance(transaction.balance);
-            transactionRecord.setDescription(transaction.description);
+            transactionRecord.setDate(transaction.getDate());
+            transactionRecord.setAmount(transaction.getAmount());
+            transactionRecord.setBalance(transaction.getBalance());
+            transactionRecord.setDescription(transaction.getDescription());
             transactionRecordList.add(transactionRecord);
         });
 
@@ -199,10 +199,10 @@ public class BankCosmosDb {
         account.getTransactions().forEach(transaction -> {
 
             TransactionRecord transactionRecord = new TransactionRecord();
-            transactionRecord.setDate(transaction.date);
-            transactionRecord.setAmount(transaction.amount);
-            transactionRecord.setBalance(transaction.balance);
-            transactionRecord.setDescription(transaction.description);
+            transactionRecord.setDate(transaction.getDate());
+            transactionRecord.setAmount(transaction.getAmount());
+            transactionRecord.setBalance(transaction.getBalance());
+            transactionRecord.setDescription(transaction.getDescription());
             transactionRecordList.add(transactionRecord);
         });
 
@@ -261,7 +261,7 @@ public class BankCosmosDb {
         retrieved.forEach(accountRecord -> {
 
             Customer owner = Customer
-                    .getCustomerByUserName(accountRecord.getUserName());
+                    .getCustomerByName(accountRecord.getUserName());
 
             Account account = new Account(accountRecord.getUserName(),
                     accountRecord.getAccountName());

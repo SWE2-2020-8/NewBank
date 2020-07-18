@@ -1,4 +1,5 @@
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * NewBank class
@@ -36,7 +37,7 @@ public class NewBank {
      */
     public Customer checkLogInDetails(String userName, String password) {
 
-        Customer foundUser = Customer.getCustomer(userName);
+        Customer foundUser = Customer.getCustomerByName(userName);
         return Objects.nonNull(foundUser) && foundUser.isPasswordOK(password)
                 ? foundUser
                 : null;
@@ -68,23 +69,32 @@ public class NewBank {
         case "SHOWMYACCOUNTS":
             return showMyAccounts(customer);
 
-        case "NEWACCOUNT": // created this so customer can call new account
-            return newAccount(customer, param1);
+        case "ADDACCOUNT":
+            return addAccount(customer, param1);
+
+        case "DEPOSIT":
+            return deposit(customer, param1, param2);
 
         case "MOVE":
+            // to do
             return NewBank.FAIL;
 
         case "PAY":
+            // to do
             return NewBank.FAIL;
 
         case "CHANGEPASSWORD":
             return changePassword(customer, param1, param2);
 
-        case "ADDUSER": // created this so customer can call new account
+        case "ADDUSER":
             return addUser(customer, param1, param2);
 
-        case "LISTUSERS": // created this so customer can call new account
+        case "LISTUSERS":
             return listUsers(customer);
+
+        case "LISTACCOUNTS":
+            // to do
+            return NewBank.FAIL;
 
         default:
             printTrace(customer, "Invalid input (try OPTIONS)");
@@ -98,7 +108,14 @@ public class NewBank {
      *
      * Use the constants to return success and fail to avoid typos
      * 
+     * Changes in the database happen here using the following methods:
+     * BankCosmosDb .createCustomerDocument,
+     * BankCosmosDb.replaceCustomerDocument, BankCosmosDb.createAccountDocument
+     * & BankCosmosDb.replaceAccountDocument
+     * 
      * Use printTrace to output a message in the console for traceability
+     * 
+     * 
      */
 
     static final String SUCCESS = "SUCCESS";
@@ -114,12 +131,14 @@ public class NewBank {
         String s;
         s = "Options avilable are:\n";
         s += "SHOWMYACCOUNTS : to view all Accounts under your name.\n";
-        s += "NEWACCOUNT <Account Name> : to create new account \n";
+        s += "ADDACCOUNT <Account Name> : to create new account \n";
+        s += "DEPOSIT <Account Name> <Amount> : deposit money\n";
         s += "MOVE <Amount> <From Account> <To Account> : to move money\n";
         s += "PAY <UserID> <Amount> : to transfer money\n";
         s += "CHANGEPASSWORD <Old Password> <New Password> : change password\n";
         s += "ADDUSER <UserID> <Password> : create user (only admin)\n";
         s += "LISTUSERS : list users (only admin)\n";
+        s += "LISTACCOUNTS : list all accounts (only admin)\n";
         return s + NewBank.SUCCESS;
     }
 
@@ -137,9 +156,10 @@ public class NewBank {
      * Open a new account for a customer
      * 
      */
-    private String newAccount(Customer customer, String accountName) {
+    private String addAccount(Customer customer, String accountName) {
 
-        if (accountName.length() > 3) {
+        if (accountName.length() > 3
+                && !customer.hasAccountByName(accountName)) {
 
             BankCosmosDb.createAccountDocument(
                     customer.addAccount(accountName, 0.0));
@@ -148,6 +168,36 @@ public class NewBank {
 
         } else {
             printTrace(customer, "Account not added");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * Deposit money into an account
+     * 
+     */
+    private String deposit(Customer customer, String accountName,
+            String amountString) {
+
+        Double amount = 0.0;
+        try {
+            amount = Double.parseDouble(amountString);
+        } catch (Exception e) {
+            return NewBank.FAIL;
+        }
+
+        if (customer.hasAccountByName(accountName) && amount > 0) {
+
+            Account account = customer.getAccountByName(accountName);
+
+            // The transaction itself
+            account.newTransaction(amount, "Deposit");
+
+            BankCosmosDb.replaceAccountDocument(account);
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Issue with the deposit");
             return NewBank.FAIL;
         }
     }
@@ -181,7 +231,7 @@ public class NewBank {
 
         if (userName.length() > 3 && password.length() > 3
                 && customer.getUserName().equals("Admin")
-                && !Customer.getAllCustomersMap().containsKey(userName)) {
+                && !Customer.isCustomer(userName)) {
 
             BankCosmosDb
                     .createCustomerDocument(new Customer(userName, password));
@@ -203,13 +253,12 @@ public class NewBank {
 
         if (customer.getUserName().equals("Admin")) {
 
-            StringBuilder sb = new StringBuilder();
-            Customer.getAllCustomersMap()
-                    .entrySet()
-                    .forEach(es -> sb.append(es.getKey() + "\t"
-                            + es.getValue().getPassword() + "\n"));
             printTrace(customer, "Users listed");
-            return sb.toString() + NewBank.SUCCESS;
+            return Customer.getAllCustomersList()
+                    .stream()
+                    .map(Customer::toString)
+                    .map("\n"::concat)
+                    .collect(Collectors.joining()) + NewBank.SUCCESS;
 
         } else {
             printTrace(customer, "Users not listed");

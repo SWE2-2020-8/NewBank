@@ -50,7 +50,10 @@ public class BankTests {
         BankCosmosDb.createCustomerDocument(new Customer("Christina", "lol"));
         BankCosmosDb.createCustomerDocument(new Customer("John", "nhoj"));
 
-        assertTrue(Customer.getAllCustomersMap().size() > 0);
+        assertTrue(Customer.isCustomer("Admin"));
+        assertTrue(Customer.isCustomer("Bhagy"));
+        assertTrue(Customer.isCustomer("Christina"));
+        assertTrue(Customer.isCustomer("John"));
     }
 
     @Test
@@ -75,7 +78,7 @@ public class BankTests {
         Random random = new Random();
 
         BankCosmosDb.loadBankCustomers();
-        Object[] arrayCust = Customer.getAllCustomersMap().values().toArray();
+        Object[] arrayCust = Customer.getAllCustomersList().toArray();
         Customer chosenCustomer = (Customer) arrayCust[random
                 .nextInt(arrayCust.length)];
         System.err.println("Found " + chosenCustomer.getUserName());
@@ -89,14 +92,47 @@ public class BankTests {
     }
 
     @Test
+    public void addRandomTransactionToRandomAccountToRandomCustomerTest() {
+
+        Random random = new Random();
+        BankCosmosDb.loadBankCustomers();
+        BankCosmosDb.loadBankAccounts();
+
+        // get a random customer
+        Object[] arrayCust = Customer.getAllCustomersList().toArray();
+        Customer chosenCustomer = (Customer) arrayCust[random
+                .nextInt(arrayCust.length)];
+        System.err.println("Found " + chosenCustomer.getUserName());
+
+        // get a random account
+        Object[] arrayAcc = chosenCustomer.getAccounts().toArray();
+        if (arrayAcc.length == 0)
+            System.err.println(
+                    "Sorry, just selected a user with no accounts, test screwed");
+        Account chosenAccount = (Account) arrayAcc[random
+                .nextInt(arrayAcc.length)];
+        System.err.println("Found " + chosenAccount.getAccountName());
+
+        // make a new transaction
+        Double amount = Math.nextUp(random.nextDouble() * 1000);
+        chosenAccount.newTransaction(amount,
+                "Random transaction " + Double.toString(amount));
+
+        BankCosmosDb.replaceAccountDocument(chosenAccount);
+
+        assertTrue(chosenAccount.getTransactions()
+                .stream()
+                .anyMatch(transaction -> transaction.getAmount() == amount));
+    }
+
+    @Test
     public void loadUsersAndAccountsTest() {
 
         BankCosmosDb.loadBankCustomers();
         BankCosmosDb.loadBankAccounts();
 
         // Assumes there's a customer named Christina and that she has accounts
-        assertNotNull(Customer.getCustomerByUserName("Christina"));
-        assertNotNull(
-                Customer.getCustomerByUserName("Christina").getAccounts());
+        assertNotNull(Customer.getCustomerByName("Christina"));
+        assertNotNull(Customer.getCustomerByName("Christina").getAccounts());
     }
 }
