@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /*
  * Customer class
@@ -103,6 +104,14 @@ public class Customer {
      */
     public List<Account> getAccounts() {
         return this.accounts;
+    }
+
+    /*
+     * Get account stream from the user
+     * 
+     */
+    public Stream<Account> getAccountStream() {
+        return this.accounts.stream();
     }
 
     /*

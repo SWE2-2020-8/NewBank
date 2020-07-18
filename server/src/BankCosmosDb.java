@@ -156,7 +156,7 @@ public class BankCosmosDb {
         customerRecord.setPassword(customer.getPassword());
 
         BankCosmosDb.containerIdentity.createItem(customerRecord);
-        printTrace("Created identity " + customerRecord);
+        printTrace("Created identity " + customer);
     }
 
     /*
@@ -175,7 +175,7 @@ public class BankCosmosDb {
                         new PartitionKey(customerRecord.getId()),
                         new CosmosItemRequestOptions());
 
-        printTrace("Identity document replace response code: "
+        printTrace("Identity document replaced by " + customer + " status code "
                 + customerResponse.getStatusCode());
     }
 
@@ -207,7 +207,7 @@ public class BankCosmosDb {
                 .toArray(new TransactionRecord[transactionRecordList.size()]));
 
         BankCosmosDb.containerAccounts.createItem(accountRecord);
-        printTrace("Created account " + accountRecord);
+        printTrace("Created account " + account);
     }
 
     /*
@@ -242,7 +242,7 @@ public class BankCosmosDb {
                         new PartitionKey(accountRecord.getId()),
                         new CosmosItemRequestOptions());
 
-        printTrace("Account document replace response code: "
+        printTrace("Account  document replaced by " + account + " status code "
                 + customerResponse.getStatusCode());
     }
 

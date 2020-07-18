@@ -130,7 +130,7 @@ public class Account {
     @Override
     public String toString() {
 
-        return "<" + this.userName + "#" + this.accountName + "#"
-                + this.transactions + ">";
+        return "<" + this.userName + "#" + this.accountName + "#" + this.balance
+                + "#" + this.transactions + ">";
     }
 }

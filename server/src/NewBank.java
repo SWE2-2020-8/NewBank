@@ -93,8 +93,7 @@ public class NewBank {
             return listUsers(customer);
 
         case "LISTACCOUNTS":
-            // to do
-            return NewBank.FAIL;
+            return listAccounts(customer);
 
         default:
             printTrace(customer, "Invalid input (try OPTIONS)");
@@ -246,7 +245,7 @@ public class NewBank {
     }
 
     /*
-     * List users
+     * List all users (only Admin)
      * 
      */
     private String listUsers(Customer customer) {
@@ -257,11 +256,33 @@ public class NewBank {
             return Customer.getAllCustomersList()
                     .stream()
                     .map(Customer::toString)
-                    .map("\n"::concat)
-                    .collect(Collectors.joining()) + NewBank.SUCCESS;
+                    .collect(Collectors.joining("\n", "", "\n"))
+                    + NewBank.SUCCESS;
 
         } else {
             printTrace(customer, "Users not listed");
+            return NewBank.FAIL;
+        }
+    }
+
+    /*
+     * List all accounts (only Admin)
+     * 
+     */
+    private String listAccounts(Customer customer) {
+
+        if (customer.getUserName().equals("Admin")) {
+
+            printTrace(customer, "Accounts listed");
+            return Customer.getAllCustomersList()
+                    .stream()
+                    .flatMap(Customer::getAccountStream)
+                    .map(Account::toString)
+                    .collect(Collectors.joining("\n", "", "\n"))
+                    + NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Accounts not listed");
             return NewBank.FAIL;
         }
     }

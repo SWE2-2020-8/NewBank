@@ -36,7 +36,7 @@ public class BankTests {
         assertTrue(retrieved.size() > 0);
     }
 
-    @Ignore("Only used to reset the user database")
+    @Ignore("Only used to reset the user database, do not use!")
     @Test
     public void resetBankCustomers() {
 
@@ -84,7 +84,7 @@ public class BankTests {
         System.err.println("Found " + chosenCustomer.getUserName());
 
         Account newAccount = chosenCustomer.addAccount(
-                "Testaccount" + random.nextInt(9999), +random.nextInt(9999));
+                "Testaccount" + random.nextInt(99), +random.nextInt(9999));
 
         BankCosmosDb.createAccountDocument(newAccount);
 
@@ -114,7 +114,7 @@ public class BankTests {
         System.err.println("Found " + chosenAccount.getAccountName());
 
         // make a new transaction
-        Double amount = Math.nextUp(random.nextDouble() * 1000);
+        Double amount = (double) Math.round(random.nextDouble() * 1000);
         chosenAccount.newTransaction(amount,
                 "Random transaction " + Double.toString(amount));
 
