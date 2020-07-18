@@ -59,7 +59,8 @@ public class NewBank {
             param2 = words[2];
         String param3 = "";
         if (words.length > 3)
-            param2 = words[3];
+            param3 = words[3];
+            
 
         switch (command) {
 
