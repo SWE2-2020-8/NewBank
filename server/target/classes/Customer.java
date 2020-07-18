@@ -1,7 +1,7 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /*
  * Customer class
@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Customer {
 
-    private static Map<String, Customer> allCustomersMap = new HashMap<>();
+    private static List<Customer> allCustomers = new ArrayList<>();
     private String userName;
     private String password;
     private ArrayList<Account> accounts;
@@ -24,7 +24,7 @@ public class Customer {
         this.userName = userName;
         this.password = password;
         this.accounts = new ArrayList<>();
-        Customer.allCustomersMap.put(userName, this);
+        Customer.allCustomers.add(this);
     }
 
     /*
@@ -43,6 +43,78 @@ public class Customer {
     }
 
     /*
+     * Static method the full customer list
+     * 
+     */
+    public static List<Customer> getAllCustomersList() {
+
+        return Customer.allCustomers;
+    }
+
+    /*
+     * Static method to get the if an userName already exists
+     * 
+     */
+    public static boolean isCustomer(String userName) {
+
+        return Customer.allCustomers.stream()
+                .anyMatch(customer -> customer.userName.equals(userName));
+    }
+
+    /*
+     * Static method to get the Customer object that corresponds to a userName
+     * 
+     */
+    public static Customer getCustomerByName(String userName) {
+
+        return Customer.allCustomers.stream()
+                .filter(customer -> customer.userName.equals(userName))
+                .findAny()
+                .orElse(null);
+    }
+
+    /*
+     * Get the username for a customer instance
+     * 
+     */
+    public String getUserName() {
+        return this.userName;
+    }
+
+    /*
+     * Get the password for a customer instance
+     * 
+     */
+    public String getPassword() {
+
+        return this.password;
+    }
+
+    /*
+     * Method to check if password is ok
+     * 
+     */
+    boolean isPasswordOK(String password) {
+        return this.password.equals(password);
+    }
+
+    /*
+     * Get the accounts from the user
+     * 
+     */
+    public List<Account> getAccounts() {
+        return this.accounts;
+    }
+
+    /*
+     * Get account stream from the user
+     * 
+     */
+    public Stream<Account> getAccountStream() {
+        return this.accounts.stream();
+    }
+
+    /*
      * Method to add an account for an existing user
      * 
      */
@@ -53,54 +125,25 @@ public class Customer {
     }
 
     /*
-     * Static method to get the if an userName already exists
+     * Get a specific account from the user by name
      * 
      */
-    public static boolean isCustomer(String userName) {
+    public Account getAccountByName(String accountName) {
 
-        return Customer.allCustomersMap.keySet().contains(userName);
+        return this.getAccounts()
+                .stream()
+                .filter(account -> account.getAccountName().equals(accountName))
+                .findFirst()
+                .orElse(null);
     }
 
     /*
-     * Static method to get the Customer object that corresponds to a userName
+     * Check if the user has an account by that name
      * 
      */
-    public static Customer getCustomer(String userName) {
+    public boolean hasAccountByName(String accountName) {
 
-        return Customer.allCustomersMap.get(userName);
-    }
-
-    /*
-     * Get the username
-     * 
-     */
-    public String getUserName() {
-        return this.userName;
-    }
-
-    /*
-     * Get the password
-     * 
-     */
-    public String getPassword() {
-
-        return this.password;
-    }
-
-    /**
-     * Method to check if password is ok
-     * 
-     * @param password
-     */
-    boolean isPasswordOK(String password) {
-        return this.password.equals(password);
-    }
-
-    /**
-     * Get the accounts from the user
-     */
-    public List<Account> getAccounts() {
-        return this.accounts;
+        return Objects.nonNull(this.getAccountByName(accountName));
     }
 
     /*
@@ -108,22 +151,6 @@ public class Customer {
      */
     public void addAccounts(List<Account> accounts) {
         this.accounts.addAll(accounts);
-    }
-
-    /*
-     * Get the full customer list
-     */
-    public static Map<String, Customer> getAllCustomersMap() {
-
-        return Customer.allCustomersMap;
-    }
-
-    /*
-     * Get the customer by
-     */
-    public static Customer getCustomerByUserName(String userName) {
-
-        return Customer.allCustomersMap.get(userName);
     }
 
     /*
@@ -139,7 +166,7 @@ public class Customer {
     @Override
     public String toString() {
 
-        return "<" + this.userName + "/" + this.password + ">";
+        return "<" + this.userName + "#" + this.password + ">";
     }
 
     /*
