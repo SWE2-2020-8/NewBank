@@ -9,9 +9,9 @@
 public class TransactionRecord {
 
     private String date = "";
-    private double amount;
-    private double balance;
-    private String description;
+    private double amount = 0.0;
+    private double balance = 0.0;
+    private String description = "";
 
     public String getDate() {
         return date;
