@@ -22,6 +22,9 @@ public class NewBankClientHandler extends Thread {
     private PrintWriter out;
     private SocketAddress address;
 
+    static final String SUCCESS = "SUCCESS";
+    static final String FAIL = "FAIL";
+
     /*
      * Constructor, is given a specific socket, creates a new bank object, opens
      * a reader and a writer for the socket
@@ -56,9 +59,12 @@ public class NewBankClientHandler extends Thread {
                 /*
                  * login successful
                  */
-                out.println("Log In Successful (type OPTIONS for help)");
+
+
+                out.println(NewBankClientHandler.SUCCESS + "\n Log In Successful (type OPTIONS for help)");
                 printTrace(address,
                         "SUCCESSFUL LOGIN FROM " + customer.getUserName());
+                      
 
                 /*
                  * service loop
@@ -84,7 +90,7 @@ public class NewBankClientHandler extends Thread {
                 /*
                  * customer rejection
                  */
-                out.println("Log In Failed");
+                out.println(NewBankClientHandler.FAIL  + "\n Log In Failed");
                 printTrace(address, "HANDLER TERMINATED - INCORRECT LOGIN");
             }
         } catch (EOFException e) {
