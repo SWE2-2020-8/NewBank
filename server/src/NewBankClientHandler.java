@@ -61,7 +61,9 @@ public class NewBankClientHandler extends Thread {
                  */
 
 
-                out.println(NewBankClientHandler.SUCCESS + "\n Log In Successful (type OPTIONS for help)");
+                out.println(NewBankClientHandler.SUCCESS);
+                out.println( "Log In Successful (type OPTIONS for help)");
+
                 printTrace(address,
                         "SUCCESSFUL LOGIN FROM " + customer.getUserName());
                       
@@ -90,7 +92,8 @@ public class NewBankClientHandler extends Thread {
                 /*
                  * customer rejection
                  */
-                out.println(NewBankClientHandler.FAIL  + "\n Log In Failed");
+                out.println(NewBankClientHandler.FAIL);
+                out.println("\n Log In Failed");
                 printTrace(address, "HANDLER TERMINATED - INCORRECT LOGIN");
             }
         } catch (EOFException e) {
