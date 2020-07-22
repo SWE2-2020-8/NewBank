@@ -78,7 +78,7 @@ public class NewBank {
 
         case "MOVE":
             // to do
-            return NewBank.FAIL;
+            return Move(customer, param1, param2, param3);
 
         case "PAY":
             // to do
@@ -198,6 +198,39 @@ public class NewBank {
 
         } else {
             printTrace(customer, "Issue with the deposit");
+            return NewBank.FAIL;
+        }
+    }
+
+     /*
+     * Move money from an account to a diffrent account
+     * 
+     */
+    private String Move(Customer customer, String amountString, String accountName,
+            String accountName1) { 
+
+        Double amount = 0.0;
+        try {
+            amount = Double.parseDouble(amountString);
+        } catch (Exception e) {
+            return NewBank.FAIL;
+        }
+
+        Account account = customer.getAccountByName(accountName);
+        Account account1 = customer.getAccountByName(accountName1);
+
+        if (customer.hasAccountByName(accountName) && customer.hasAccountByName(accountName1) && amount > Account.getBalance(accountName)) {
+
+            // The transaction 
+            account.newTransaction( + amount, "amount moved");
+            account1.newTransaction( + amount, "amount added from other account");
+
+            BankCosmosDb.replaceAccountDocument(account);
+            BankCosmosDb.replaceAccountDocument(account1);
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Issue with moving money");
             return NewBank.FAIL;
         }
     }
