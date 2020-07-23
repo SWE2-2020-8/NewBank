@@ -71,7 +71,7 @@ public class Account {
     private String accountId;
     private String userName;
     private String accountName;
-    private static double balance;
+    private double balance;
     private List<Transaction> transactions;
 
     public Account(String userName, String accountName) {
@@ -94,14 +94,12 @@ public class Account {
         return accountName;
     }
 
-    public static double getBalance() {
+    public  double getBalance() {
         return balance;
     }
 
-
-
     public void setBalance(double balance) {
-        Account.balance = balance;
+        this.balance = balance;
     }
 
     public List<Transaction> getTransactions() {
@@ -114,35 +112,36 @@ public class Account {
 
     public void addTransaction(Transaction transaction) {
         this.transactions.add(transaction);
-        Account.balance = transaction.balance;
+        this.balance = transaction.balance;
     }
-
 
     /*
      * Easily make a new transaction in this account
      */
     public void newTransaction(Double amount, String description) {
 
-        this.addTransaction(new Account.Transaction(amount,
-                Account.getBalance() + amount, description));
+        this.addTransaction(new Account.Transaction(amount, this.getBalance() + amount, description));
 
         this.addTransaction(new Account.Transaction(amount,
-                Account.getBalance() - amount, description));
+        this.getBalance() - amount, description));
 
         
     }
 
+    public  Double getBalance(String accountName) {
+		return this.balance;
+    }
+    
+   
     /*
      * toString()
      */
     @Override
     public String toString() {
 
-        return "<" + this.userName + "#" + this.accountName + "#" + Account.balance
+        return "<" + this.userName + "#" + this.accountName + "#" + this.balance
                 + "#" + this.transactions + ">";
     }
 
-	public static Double getBalance(String accountName) {
-		return balance;
-	}
+
 }
