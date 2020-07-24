@@ -4,9 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.value.ObservableObjectValue;
+import javafx.beans.binding.When;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
@@ -74,13 +72,26 @@ public class MyShapes extends Application {
         Text text2 = new Text("Another text");
         text.setFont(new Font("Arial Bold", 24));
 
+        Text text3 = new Text("Another text");
+        text.setFont(new Font("Arial Bold", 24));
+
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(stackPane, text2);
+        vbox.getChildren().addAll(stackPane, text2, text3);
 
         rotate.statusProperty()
-                .addListener(observable -> text2.setText("Animation status: "
-                        + ((ObservableObjectValue<Animation.Status>) observable)
-                                .getValue()));
+                .addListener(observable -> text2
+                        .setText("Animation status: " + rotate.getStatus()));
+
+        rotate.statusProperty()
+                .addListener((observableValue, oldValue, newValue) -> {
+                    text3.setText("Was " + oldValue + ", Now " + newValue);
+                });
+
+        text3.rotateProperty().bind(text.rotateProperty());
+        text2.strokeProperty()
+                .bind(new When(rotate.statusProperty()
+                        .isEqualTo(Animation.Status.RUNNING)).then(Color.GREEN)
+                                .otherwise(Color.RED));
 
         Scene scene = new Scene(vbox, 350, 230, Color.LIGHTYELLOW);
         stage.setTitle("MyShapes with JavaFX");
