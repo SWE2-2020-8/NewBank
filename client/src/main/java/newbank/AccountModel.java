@@ -12,7 +12,6 @@ import javafx.util.Callback;
 public class AccountModel {
 
     private StringProperty id = new SimpleStringProperty(this, "id", "");
-    private StringProperty user = new SimpleStringProperty(this, "user", "");
     private StringProperty name = new SimpleStringProperty(this, "name", "");
     private DoubleProperty balance = new SimpleDoubleProperty(this, "balance",
             0.0);
@@ -37,6 +36,10 @@ public class AccountModel {
     public static Callback<AccountModel, Observable[]> extractor = p -> new Observable[] {
             p.idProperty(), p.balanceProperty() };
 
+    public String getName() {
+        return this.name.get();
+    }
+
     public Double getBalance() {
         return this.balance.get();
     }
@@ -59,7 +62,7 @@ public class AccountModel {
 
     @Override
     public String toString() {
-        return name.get() + " " + balance.get();
+        return name.get();
     }
 
     @Override
