@@ -7,20 +7,22 @@ import java.io.PrintWriter;
 // A Java program for a Client
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BankClient {
 
     // initialize socket and input output streams
-    private boolean loggedIn = false;
-    private Socket socket = null;
-    private PrintWriter bankOut = null;
-    private BufferedReader bankIn = null;
+    private static boolean loggedIn = false;
+    private static Socket socket = null;
+    private static PrintWriter bankOut = null;
+    private static BufferedReader bankIn = null;
 
     // To properly use the bankIn stream
-    Predicate<String> dataInBuffer = line -> {
+    private static Predicate<String> dataInBuffer = line -> {
         try {
             return bankIn.ready();
         } catch (IOException i) {
@@ -29,17 +31,22 @@ public class BankClient {
     };
 
     // To match the success string
-    Predicate<String> isSuccess = line -> line.matches("^SUCCESS");
+    private static Predicate<String> isSuccess = line -> line
+            .matches("^SUCCESS");
 
     // To match the fail string
-    Predicate<String> isFail = line -> line.matches("^FAIL");
+    private static Predicate<String> isFail = line -> line.matches("^FAIL");
 
     // Response not complete
-    Predicate<String> responseNotComplete = line -> line
+    private static Predicate<String> responseNotComplete = line -> line
             .matches("^(?!SUCCESS|FAIL).+");
 
-    // constructor to put ip address and port
-    public BankClient(String address, int port) {
+    // constructor not allowed
+    private BankClient() {
+    };
+
+    // To connect
+    public static void connect(String address, int port) {
         // establish a connection
         try {
             socket = new Socket(address, port);
@@ -59,7 +66,8 @@ public class BankClient {
         printTrace("Connected");
     }
 
-    public boolean bankLogin(String username, String password) {
+    // To login
+    public static boolean bankLogin(String username, String password) {
 
         bankOut.println(username);
         bankOut.println(password);
@@ -72,24 +80,45 @@ public class BankClient {
             printTrace("Exception in method bankLogin");
         }
 
-        this.loggedIn = isSuccess.test(line);
+        BankClient.loggedIn = isSuccess.test(line);
 
-        printTrace("Authenticated = " + this.loggedIn);
-        return this.loggedIn;
+        printTrace("Authenticated = " + BankClient.loggedIn);
+        return BankClient.loggedIn;
     }
 
-    public boolean getAccounts() {
+    // To get accounts
+    public static List<AccountModel> getAccounts() {
+
+        List<AccountModel> retrieved = new ArrayList<>();
 
         bankOut.println("SHOWMYACCOUNTS");
+        Pattern p = Pattern.compile(
+                "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?\\d*.\\d*)#\\[(.*)\\]\\>$");
 
         String line = "";
         try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+"))
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+
                 System.err.println(line);
+                Matcher m = p.matcher(line);
+                if (m.find()) {
+
+                    // print the group out for verification
+                    System.out.println(
+                            "Retrieved: " + m.group(1) + "\t" + m.group(2)
+                                    + "\t" + m.group(3) + "\t" + m.group(4));
+                    retrieved.add(new AccountModel(m.group(1), m.group(2),
+                            m.group(3), m.group(4)));
+
+                } else {
+                    System.err.println("Discarded");
+                }
+            }
+
         } catch (IOException e) {
             printTrace("Exception in method getAccounts");
         }
-        return isSuccess.test(line);
+        return retrieved;
     }
 
     @Override
@@ -107,8 +136,8 @@ public class BankClient {
     /*
      * Auxiliary trace method to print in the console to correct errors
      */
-    private void printTrace(String message) {
+    private static void printTrace(String message) {
 
-        System.err.println(this.getClass().getName() + ": " + message);
+        System.err.println(BankClient.class.getName() + ": " + message);
     }
 }

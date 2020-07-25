@@ -1,9 +1,9 @@
 package newbank;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 public class AccountController implements Initializable {
 
@@ -20,10 +22,26 @@ public class AccountController implements Initializable {
             .observableArrayList();
 
     @FXML
+    private TableView<AccountModel.Transaction> transactionTable;
+    private ObservableList<AccountModel.Transaction> transactionList = FXCollections
+            .observableArrayList();
+    @FXML
+    private TableColumn<AccountModel.Transaction, String> dateColumn;
+    @FXML
+    private TableColumn<AccountModel.Transaction, String> amountColumn;
+    @FXML
+    private TableColumn<AccountModel.Transaction, String> balanceColumn;
+    @FXML
+    private TableColumn<AccountModel.Transaction, String> descriptionColumn;
+
+    @FXML
     private Label detailName;
 
     @FXML
     private Label detailBalance;
+
+    @FXML
+    private Label detailOwner;
 
     @FXML
     private void clickedClose(ActionEvent event) {
@@ -34,29 +52,39 @@ public class AccountController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // Login
-        BankClient bankClient = new BankClient(
-                "swe2-2020-8.southeastasia.azurecontainer.io", 80);
-
-        bankClient.bankLogin("Admin", "1234");
-
-        // Populate the accountList
-        accountList.add(new AccountModel("asas", "Main", 1000.0));
-        accountList.add(new AccountModel("asasdf", "Savings", 3000.0));
-        accountList.add(new AccountModel("asassdf", "Others", 50.0));
+        // Populate the accounts list
+        accountList.addAll(BankClient.getAccounts());
 
         // Add it to the ListView
         listViewAccounts.setItems(accountList);
+
+        // Set the columns
+        dateColumn.setCellValueFactory(
+                cellData -> cellData.getValue().dateProperty());
+        amountColumn.setCellValueFactory(
+                cellData -> cellData.getValue().amountProperty());
+        balanceColumn.setCellValueFactory(
+                cellData -> cellData.getValue().balanceProperty());
+        descriptionColumn.setCellValueFactory(
+                cellData -> cellData.getValue().descriptionProperty());
 
         // Add a listener for selection change
         listViewAccounts.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
+
                     System.err.println(newValue.toString());
+
+                    // Details section
                     detailName.setText(newValue.getName());
-                    detailBalance.setText(newValue.getBalance().toString());
+                    detailBalance.setText(newValue.getBalance());
+                    detailOwner.setText(newValue.getOwner());
 
+                    // Transaction table
+                    transactionList.clear();
+                    transactionList.addAll(newValue.getTransactions());
+                    System.err.println(transactionList);
+                    transactionTable.setItems(transactionList);
                 });
-
     }
 }
