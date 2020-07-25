@@ -83,7 +83,6 @@ public class AccountController implements Initializable {
                     // Transaction table
                     transactionList.clear();
                     transactionList.addAll(newValue.getTransactions());
-                    System.err.println(transactionList);
                     transactionTable.setItems(transactionList);
                 });
     }
