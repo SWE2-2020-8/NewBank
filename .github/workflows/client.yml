@@ -1,6 +1,14 @@
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "server/**"
+      - "client/target/**"
+      - "client/test/**"
+      - "README.md"
+      - "client/README.md"
+      - ".gitignore"
 
 name: Build_NewBank_Client
 
@@ -17,9 +25,6 @@ jobs:
           docker build -t gabrielbcn/newbankclient:1.0 .
           docker run --rm --entrypoint cat gabrielbcn/newbankclient:1.0  /target/newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar > newbankclient.jar
 
-      - name: Upload to release
-        uses: JasonEtco/upload-to-release@master
+      - uses: actions/upload-artifact@v2
         with:
-          args: newbankclient.jar application/java-archive
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: newbankclient.jar
