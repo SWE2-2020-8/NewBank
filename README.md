@@ -6,6 +6,7 @@ To jump quickly to...
 
 - [Main board](https://github.com/orgs/SWE2-2020-8/projects/1), kanban board for management activities
 - [The code repository](https://github.com/SWE2-2020-8/NewBank)
+- [Releases section](https://github.com/SWE2-2020-8/NewBank/releases/) to find the latest client
 - The [NewBank board](https://github.com/SWE2-2020-8/NewBank/projects/1), or kanban board for code works
 - [Wiki](https://github.com/SWE2-2020-8/NewBank/wiki), for requirements compilation and other documentation
 - [Issues](https://github.com/SWE2-2020-8/NewBank/issues), to identify activities including defects
@@ -17,3 +18,5 @@ And in order to understand how to run the server locally or how the automation h
 Server is running in http://swe2-2020-8.southeastasia.azurecontainer.io
 
 Interact with `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
+
+Or interact with the client which can be downloaded in the [releases section](https://github.com/SWE2-2020-8/NewBank/releases/)
