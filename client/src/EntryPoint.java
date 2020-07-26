@@ -1,4 +1,3 @@
-package newbank;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -12,10 +11,10 @@ public class EntryPoint extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader
-                .load(getClass().getResource("/fxml/Scene.fxml"));
+                .load(getClass().getResource("fxml/Scene.fxml"));
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
+        scene.getStylesheets().add("styles/Styles.css");
 
         stage.setTitle("NewBank Client");
         stage.setScene(scene);

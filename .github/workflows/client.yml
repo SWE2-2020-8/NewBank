@@ -1,0 +1,26 @@
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "server/**"
+      - "client/target/**"
+      - "client/test/**"
+      - "README.md"
+      - "client/README.md"
+      - ".gitignore"
+
+name: Build_NewBank_Client
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # checkout the repo
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@master
+
+      - run: |
+          cd client
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}

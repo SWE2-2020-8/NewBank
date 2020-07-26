@@ -1,4 +1,3 @@
-package newbank;
 
 import java.net.URL;
 import java.time.LocalDate;
