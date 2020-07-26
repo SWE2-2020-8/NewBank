@@ -1,6 +1,6 @@
 on:
   release:
-    types: [created, published, prereleased, released]
+    types: [created]
 
 name: Build_NewBank_Client
 
