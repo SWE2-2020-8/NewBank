@@ -3,7 +3,7 @@ client/.DS_Store
 server/.DS_Store
 server/target/
 client/target/
-server/.settings
-client/.settings
-.settings
-.vscode
+server/.settings/
+client/.settings/
+.settings/
+.vscode/
