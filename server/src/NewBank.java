@@ -1,6 +1,7 @@
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
 /**
  * NewBank class
  * 
@@ -77,12 +78,10 @@ public class NewBank {
             return deposit(customer, param1, param2);
 
         case "MOVE":
-            // to do
             return Move(customer, param1, param2, param3);
 
         case "PAY":
-            // to do
-            return NewBank.FAIL;
+            return pay(customer, param1, param2);
 
         case "CHANGEPASSWORD":
             return changePassword(customer, param1, param2);
@@ -202,6 +201,8 @@ public class NewBank {
         }
     }
 
+    
+
      /*
      * Move money from an account to a diffrent account
      * 
@@ -209,20 +210,21 @@ public class NewBank {
     private String Move(Customer customer, String amountString, String accountName,
             String accountName1) { 
 
-        Double amount = 0.0;
+        double amount = 0.0;
         try {
             amount = Double.parseDouble(amountString);
         } catch (Exception e) {
             return NewBank.FAIL;
         }
 
+
         Account account = customer.getAccountByName(accountName);
         Account account1 = customer.getAccountByName(accountName1);
 
-        if (customer.hasAccountByName(accountName) && customer.hasAccountByName(accountName1) && amount > Account.getBalance(accountName)) {
+        if (customer.hasAccountByName(accountName) && customer.hasAccountByName(accountName1) && amount < account.getBalance(accountName)) {
 
             // The transaction 
-            account.newTransaction( + amount, "amount moved");
+            account.newTransaction( - amount, "amount moved");
             account1.newTransaction( + amount, "amount added from other account");
 
             BankCosmosDb.replaceAccountDocument(account);
@@ -235,6 +237,41 @@ public class NewBank {
         }
     }
 
+    /*
+     * Pay another client (From main account to a main account)
+     * 
+     */
+    private String pay(Customer customer, String userName,
+            String amountString) {
+        
+        Double amount = 0.0;
+        
+        try {
+            amount = Double.parseDouble(amountString);
+        } catch (Exception e) {
+            return NewBank.FAIL;
+        }
+         
+        Account Mainclient  = customer.getMainAccount();
+        Customer client = customer.getReciverName(userName);
+
+        if (amount < Mainclient.getMainBalance(Mainclient)  && client != null) {
+         
+            // The transaction itself
+            Mainclient.newTransaction( - amount, "Payed");
+      
+            BankCosmosDb.replaceAccountDocument(Mainclient);
+
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Issue with the payment");
+            return NewBank.FAIL;
+        }
+    }
+
+
+  
     /*
      * Change user's password
      * 

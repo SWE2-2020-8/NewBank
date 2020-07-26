@@ -66,6 +66,7 @@ public class Account {
         public void setDate(String date) {
             this.date = date;
         }
+        
     }
 
     private String accountId;
@@ -94,7 +95,7 @@ public class Account {
         return accountName;
     }
 
-    public  double getBalance() {
+    public double getBalance() {
         return balance;
     }
 
@@ -120,19 +121,11 @@ public class Account {
      */
     public void newTransaction(Double amount, String description) {
 
-        this.addTransaction(new Account.Transaction(amount, this.getBalance() + amount, description));
+        this.addTransaction(new Account.Transaction(+ amount, this.getBalance() + amount, description));
 
-        this.addTransaction(new Account.Transaction(amount,
-        this.getBalance() - amount, description));
-
-        
     }
 
-    public  Double getBalance(String accountName) {
-		return this.balance;
-    }
-    
-   
+  
     /*
      * toString()
      */
@@ -143,5 +136,12 @@ public class Account {
                 + "#" + this.transactions + ">";
     }
 
-
+	public double getBalance(String accountName) {
+		return this.balance;
+    }
+    
+    public double getMainBalance(Account Mainclient) {
+        return this.balance;
+    }
+   
 }
