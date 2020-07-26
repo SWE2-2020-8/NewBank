@@ -45,7 +45,7 @@ public class FXMLController implements Initializable {
                 stage.setTitle("Your accounts");
                 stage.setScene(new Scene(root));
                 stage.show();
-                // Hide this current window (if this is what you want)
+                // Hide this window
                 ((Node) (event.getSource())).getScene().getWindow().hide();
 
             } catch (IOException e) {
