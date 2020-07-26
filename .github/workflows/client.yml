@@ -22,5 +22,5 @@ jobs:
 
       - run: |
           cd client
-          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
+          docker build -t gabrielbcn/newbankclient:1.0 .
+          docker run --rm --entrypoint cat gabrielbcn/newbankclient:1.0  /target/newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar > newbankclient.jar

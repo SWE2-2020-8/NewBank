@@ -9,6 +9,10 @@ I have created a dockerfile that builds a container to create the jar and copies
 
 * In order to build the container to achieve local output:
 
-`docker build -t gabrielbcn/newbankclient:1.0 --target artifact --output type=local,dest=. .`
+`docker build -t gabrielbcn/newbankclient:1.0 .`
 
-  
+
+
+To interact with it
+
+`docker run -it gabrielbcn/newbankclient:1.0`
