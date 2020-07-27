@@ -21,7 +21,7 @@
 ### Working software
 * Server is running in `http://swe2-2020-8.southeastasia.azurecontainer.io`
 * Interact directly with server using `socat - TCP4:swe2-2020-8.southeastasia.azurecontainer.io:80`
-* Download the latest Java/JavaFX client in the [releases section](https://github.com/SWE2-2020-8/NewBank/releases)
+* Download the latest Java/JavaFX **newbankclient** in the [releases section](https://github.com/SWE2-2020-8/NewBank/releases)
 
 ### Automation notes
 * In order to understand how to run the server locally or how the automation has been built to deploy the server to Azure click [here](https://github.com/SWE2-2020-8/NewBank/blob/master/server/Readme.md)
