@@ -86,6 +86,10 @@ public class NewBankServer extends Thread {
      * 
      * Note that this will have to change if we instrument the port or change it
      * in the future
+     * 
+     * Important, the environment variable DB_MASTER_KEY must supply the key to
+     * access the database
+     *
      */
     public static void main(String[] args) throws IOException {
 

@@ -3,8 +3,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import javax.management.RuntimeErrorException;
-
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -22,11 +20,15 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 public class BankCosmosDb {
 
     /*
-     * Get database key from environment to avoid hardcoding
+     * Get database access key from environment to avoid hardcoding the key
+     * 
+     * Database access key should be stored in DB_MASTER_KEY
+     * 
+     * TO SECURE UNCOMMENT THE COMMENTED LINE BELOW AND REMOVE THE FOLLOWING
+     * LINE WITH THE KEY
      * 
      */
-    private static final String MASTER_KEY = System.getenv()
-            .get("DB_MASTER_KEY");
+    private static String MASTER_KEY = System.getenv().get("DB_MASTER_KEY");
     static {
         if (Objects.isNull(MASTER_KEY))
             throw new NullPointerException("Requires a database key!");
