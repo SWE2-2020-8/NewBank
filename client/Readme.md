@@ -11,8 +11,13 @@ I have created a dockerfile that builds a container to create the jar and copies
 
 * And to copy the file outside:
   
-`docker run --rm --entrypoint cat gabrielbcn/newbankclient:1.0 /target/newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar > newbankclient.jar`
+```
+docker create -it --name temp gabrielbcn/newbankclient:1.0 sh
 
+docker cp temp:/target/newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar .
+
+mv newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar newbankclient.jar
+```
 
 ## Release the .jar
 
