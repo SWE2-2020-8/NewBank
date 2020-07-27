@@ -30,7 +30,6 @@ jobs:
           mv newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar newbankclient.jar
           pwd
           ls -l
-          
 
       - uses: actions/upload-artifact@v2
         with:

@@ -21,7 +21,6 @@ jobs:
           pwd
           ls -l
           
-
       - uses: actions/upload-artifact@v2
         with:
           path: newbankclient.jar
