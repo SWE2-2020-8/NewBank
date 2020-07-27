@@ -26,8 +26,10 @@ jobs:
           docker create -it --name temp gabrielbcn/newbankclient:1.0 sh
           docker cp temp:/target/newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar .
           mv newbankclient-1.0-SNAPSHOT-jar-with-dependencies.jar newbankclient.jar
+          pwd
           ls -l
+          
 
       - uses: actions/upload-artifact@v2
         with:
-          path: newbankclient.jar
+          path: target/newbankclient.jar
