@@ -9,6 +9,7 @@ on:
       - "README.md"
       - "client/README.md"
       - ".gitignore"
+      - ".github/workflows/server.yml"
 
 name: Build_NewBank_Client
 
@@ -32,4 +33,4 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: target/newbankclient.jar
+          path: /home/runner/work/NewBank/NewBank/client/newbankclient.jar
