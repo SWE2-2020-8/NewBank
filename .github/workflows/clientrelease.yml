@@ -1,6 +1,6 @@
 on: release
 
-name: Build-Client-add-to-release
+name: Build-Client-add-to-Release
 
 jobs:
   build-and-add-to-release:
