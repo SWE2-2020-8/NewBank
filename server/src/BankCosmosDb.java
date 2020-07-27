@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import javax.management.RuntimeErrorException;
 
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
@@ -19,21 +22,16 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 public class BankCosmosDb {
 
     /*
-     * Get keys from environment to avoid hardcoding
+     * Get database key from environment to avoid hardcoding
      * 
-     * temporarily hardcoded though
      */
-    // public static String MASTER_KEY = System.getProperty("ACCOUNT_KEY",
-    // StringUtils.defaultString(
-    // StringUtils.trimToNull(System.getenv().get("ACCOUNT_KEY")),
-    // "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ=="));
+    private static final String MASTER_KEY = System.getenv()
+            .get("DB_MASTER_KEY");
+    static {
+        if (Objects.isNull(MASTER_KEY))
+            throw new NullPointerException("Requires a database key!");
+    }
 
-    // public static String HOST = System.getProperty("ACCOUNT_HOST",
-    // StringUtils.defaultString(
-    // StringUtils.trimToNull(System.getenv().get("ACCOUNT_HOST")),
-    // "https://swe2-2020-8.documents.azure.com:443/"));
-
-    private static final String MASTER_KEY = "gUdB3NYKNIa93PYdoEmsEQZvs3Vy0N7bXnf6WY2Ob0FSGKqpRCbz6WQfFx7BbbZiIp23kv7d5GtYY0dwUCaFEQ==";
     private static final String HOST = "https://swe2-2020-8.documents.azure.com:443/";
     private static final String DATABASE_NAME = "newBank";
 
