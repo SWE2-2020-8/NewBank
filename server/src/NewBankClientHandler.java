@@ -49,7 +49,7 @@ public class NewBankClientHandler extends Thread {
             String userName = in.readLine();
             out.println("Enter Password");
             String password = in.readLine();
-            //out.println("Checking Details...");
+            // out.println("Checking Details...");
             // authenticate user and get customer ID token from bank for use in
             // subsequent requests
             Customer customer = bank.checkLogInDetails(userName, password);
@@ -60,13 +60,13 @@ public class NewBankClientHandler extends Thread {
                  * login successful
                  */
 
-
                 out.println(NewBankClientHandler.SUCCESS);
-                out.println( "(type OPTIONS for help)");
+                out.println("// type OPTIONS for help"); // Comments start
+                                                         // always with two
+                                                         // slashes
 
                 printTrace(address,
                         "SUCCESSFUL LOGIN FROM " + customer.getUserName());
-                      
 
                 /*
                  * service loop
@@ -93,7 +93,7 @@ public class NewBankClientHandler extends Thread {
                  * customer rejection
                  */
                 out.println(NewBankClientHandler.FAIL);
-               // out.println("Log In Failed");
+                // out.println("Log In Failed");
                 printTrace(address, "HANDLER TERMINATED - INCORRECT LOGIN");
             }
         } catch (EOFException e) {
@@ -131,4 +131,3 @@ public class NewBankClientHandler extends Thread {
                 + " " + message);
     }
 }
-
