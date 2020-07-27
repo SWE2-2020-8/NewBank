@@ -10,8 +10,9 @@ on:
       - "server/README.md"
       - ".gitignore"
       - ".github/workflows/client.yml"
+      - ".github/workflows/clientrelease.yml"
 
-name: NewBankServer_to_Azure
+name: Build-Server-and-Send-to-Azure
 
 jobs:
   build-and-deploy:
@@ -19,7 +20,7 @@ jobs:
     steps:
       # checkout the repo
       - name: "Checkout GitHub Action"
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: "Login via Azure CLI"
         uses: azure/login@v1
