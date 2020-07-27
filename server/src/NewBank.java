@@ -1,7 +1,6 @@
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-
 /**
  * NewBank class
  * 
@@ -61,7 +60,6 @@ public class NewBank {
         String param3 = "";
         if (words.length > 3)
             param3 = words[3];
-            
 
         switch (command) {
 
@@ -96,10 +94,10 @@ public class NewBank {
             return listAccounts(customer);
 
         default:
-            printTrace(customer, "Invalid input (try OPTIONS)");
-            return NewBank.FAIL;
+            printTrace(customer, "Invalid input");
+            // Comments start always with two slashes
+            return "// Invalid input (try OPTIONS)\n" + NewBank.FAIL;
         }
-
     }
 
     /*
@@ -128,16 +126,18 @@ public class NewBank {
 
         printTrace(customer, "Options listed");
         String s;
-        s = "Options avilable are:\n";
-        s += "SHOWMYACCOUNTS : to view all Accounts under your name.\n";
-        s += "ADDACCOUNT <Account Name> : to create new account \n";
-        s += "DEPOSIT <Account Name> <Amount> : deposit money\n";
-        s += "MOVE <Amount> <From Account> <To Account> : to move money\n";
-        s += "PAY <UserID> <Amount> : to transfer money\n";
-        s += "CHANGEPASSWORD <Old Password> <New Password> : change password\n";
-        s += "ADDUSER <UserID> <Password> : create user (only admin)\n";
-        s += "LISTUSERS : list users (only admin)\n";
-        s += "LISTACCOUNTS : list all accounts (only admin)\n";
+        s = "// Options avilable are:\n";// Comments start
+                                         // always with two
+                                         // slashes
+        s += "// SHOWMYACCOUNTS : to view all Accounts under your name.\n";
+        s += "// ADDACCOUNT <Account Name> : to create new account \n";
+        s += "// DEPOSIT <Account Name> <Amount> : deposit money\n";
+        s += "// MOVE <Amount> <From Account> <To Account> : to move money\n";
+        s += "// PAY <UserID> <Amount> : to transfer money\n";
+        s += "// CHANGEPASSWORD <Old Password> <New Password> : change password\n";
+        s += "// ADDUSER <UserID> <Password> : create user (only admin)\n";
+        s += "// LISTUSERS : list users (only admin)\n";
+        s += "// LISTACCOUNTS : list all accounts (only admin)\n";
         return s + NewBank.SUCCESS;
     }
 
@@ -201,14 +201,12 @@ public class NewBank {
         }
     }
 
-    
-
-     /*
+    /*
      * Move money from an account to a diffrent account
      * 
      */
-    private String Move(Customer customer, String amountString, String accountName,
-            String accountName1) { 
+    private String Move(Customer customer, String amountString,
+            String accountName, String accountName1) {
 
         double amount = 0.0;
         try {
@@ -217,15 +215,16 @@ public class NewBank {
             return NewBank.FAIL;
         }
 
-
         Account account = customer.getAccountByName(accountName);
         Account account1 = customer.getAccountByName(accountName1);
 
-        if (customer.hasAccountByName(accountName) && customer.hasAccountByName(accountName1) && amount < account.getBalance(accountName)) {
+        if (customer.hasAccountByName(accountName)
+                && customer.hasAccountByName(accountName1)
+                && amount < account.getBalance(accountName)) {
 
-            // The transaction 
-            account.newTransaction( - amount, "amount moved");
-            account1.newTransaction( + amount, "amount added from other account");
+            // The transaction
+            account.newTransaction(-amount, "amount moved");
+            account1.newTransaction(+amount, "amount added from other account");
 
             BankCosmosDb.replaceAccountDocument(account);
             BankCosmosDb.replaceAccountDocument(account1);
@@ -243,23 +242,23 @@ public class NewBank {
      */
     private String pay(Customer customer, String userName,
             String amountString) {
-        
+
         Double amount = 0.0;
-        
+
         try {
             amount = Double.parseDouble(amountString);
         } catch (Exception e) {
             return NewBank.FAIL;
         }
-         
-        Account Mainclient  = customer.getMainAccount();
+
+        Account Mainclient = customer.getMainAccount();
         Customer client = customer.getReciverName(userName);
 
-        if (amount < Mainclient.getMainBalance(Mainclient)  && client != null) {
-         
+        if (amount < Mainclient.getMainBalance(Mainclient) && client != null) {
+
             // The transaction itself
-            Mainclient.newTransaction( - amount, "Payed");
-      
+            Mainclient.newTransaction(-amount, "Payed");
+
             BankCosmosDb.replaceAccountDocument(Mainclient);
 
             return NewBank.SUCCESS;
@@ -270,8 +269,6 @@ public class NewBank {
         }
     }
 
-
-  
     /*
      * Change user's password
      * 
