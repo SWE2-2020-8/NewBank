@@ -1,6 +1,6 @@
 
 import java.net.URL;
-import java.time.LocalDate;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -8,10 +8,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 
 public class AccountController implements Initializable {
 
@@ -43,19 +46,142 @@ public class AccountController implements Initializable {
     private Label detailOwner;
 
     @FXML
-    private void clickedClose(ActionEvent event) {
-        System.err.println("Close");
+    private void handleWithdraw(ActionEvent event) {
+        System.err.println(event);
 
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Withdraw money from your account");
+        dialog.setHeaderText(
+                "Withdraw money from your account " + activeAccount);
+        dialog.setContentText("Please enter the amount to withdraw:");
+        String amount = dialog.showAndWait().orElse("");
+
+        if (Objects.isNull(activeAccount))
+            showError("Please select an account first");
+        else if (!isPositiveNumber(amount))
+            showError("Illegal amount entered");
+        else if (BankClient.deposit(activeAccount.getName(), amount)) {
+            populateAccounts();
+            showMessage("You have now " + amount
+                    + " units of virtual currency in your pocket. Enjoy!");
+
+        } else
+            showError("The transaction was denied");
+    }
+
+    @FXML
+    private void handleTransfer(ActionEvent event) {
+        System.err.println(event);
+    }
+
+    @FXML
+    private void handleMove(ActionEvent event) {
+        System.err.println(event);
+    }
+
+    @FXML
+    private void handleDeposit(ActionEvent event) {
+        System.err.println(event);
+
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Deposit money into your account");
+        dialog.setHeaderText(
+                "Deposit money into your account " + activeAccount);
+        dialog.setContentText("Please enter the amount to deposit:");
+        String amount = dialog.showAndWait().orElse("");
+
+        if (Objects.isNull(activeAccount))
+            showError("Please select an account first");
+        else if (!isPositiveNumber(amount))
+            showError("Illegal amount entered");
+        else if (BankClient.deposit(activeAccount.getName(), amount))
+            populateAccounts();
+        else
+            showError("The transaction was denied");
+    }
+
+    public static boolean isPositiveNumber(String strNum) {
+        int d;
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            d = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return d > 0;
+    }
+
+    @FXML
+    private void handleAccount(ActionEvent event) {
+        System.err.println(event);
+
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Create a new account");
+        dialog.setHeaderText("Creating a NewBank account");
+        dialog.setContentText("Please enter the new account name:");
+        String name = dialog.showAndWait().orElse("");
+
+        if (name.equals(""))
+            showError("Cannot create an account with an empty name");
+        else if (name.length() < 4)
+            showError("The name of the account is too short");
+        else if (BankClient.newAccount(name))
+            populateAccounts();
+        else
+            showError("The transaction was denied");
+
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Operation error");
+        alert.setHeaderText("Error in NewBank transaction");
+        alert.setContentText(message.equals("")
+                ? "We are sorry, but the transaction wasn't successful"
+                : message);
+        alert.showAndWait();
+    }
+
+    private void showMessage(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Information message");
+        alert.setHeaderText("Information message");
+        alert.setContentText(
+                message.equals("") ? "The transaction was successful"
+                        : message);
+        alert.showAndWait();
+    }
+
+    AccountModel activeAccount;
+
+    private void populateAccounts() {
+
+        // Populate the accounts list
+        accountList.clear();
+        accountList.addAll(BankClient.getAccounts());
+
+        // Add it to the ListView
+        listViewAccounts.setItems(accountList);
+
+        if (Objects.nonNull(activeAccount)) {
+            String persistName = activeAccount.getName();
+            activeAccount = accountList.stream()
+                    .filter(account -> account.getName().equals(persistName))
+                    .findFirst()
+                    .get();
+
+            listViewAccounts.getSelectionModel()
+                    .clearAndSelect(accountList.indexOf(activeAccount));
+        }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // Populate the accounts list
-        accountList.addAll(BankClient.getAccounts());
-
-        // Add it to the ListView
-        listViewAccounts.setItems(accountList);
+        // Populate accounts
+        populateAccounts();
 
         // Set the columns
         dateColumn.setCellValueFactory(
@@ -73,6 +199,7 @@ public class AccountController implements Initializable {
                 .addListener((observable, oldValue, newValue) -> {
 
                     System.err.println(newValue.toString());
+                    activeAccount = newValue;
 
                     // Details section
                     detailName.setText(newValue.getName());
@@ -84,5 +211,6 @@ public class AccountController implements Initializable {
                     transactionList.addAll(newValue.getTransactions());
                     transactionTable.setItems(transactionList);
                 });
+
     }
 }
