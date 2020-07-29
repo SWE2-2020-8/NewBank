@@ -102,10 +102,10 @@ public class BankClient {
                 Matcher m = p.matcher(line);
                 if (m.find()) {
 
-                    // print the group out for verification
-                    System.out.println(
-                            "Retrieved: " + m.group(1) + "\t" + m.group(2)
-                                    + "\t" + m.group(3) + "\t" + m.group(4));
+                    // // print the group out for verification
+                    // System.out.println(
+                    // "Retrieved: " + m.group(1) + "\t" + m.group(2)
+                    // + "\t" + m.group(3) + "\t" + m.group(4));
                     retrieved.add(new AccountModel(m.group(1), m.group(2),
                             m.group(3), m.group(4)));
 
