@@ -14,7 +14,7 @@
 # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
 
 # First stage of the build
-FROM maven:3.6.3-jdk-8 AS MAVEN_BUILD
+FROM maven:3.6.3-jdk-11 AS MAVEN_BUILD
 
 # copy the source tree (including pom.xml) to our new container
 COPY . .
@@ -23,7 +23,7 @@ COPY . .
 RUN mvn clean package
 
 # Second stage of the build with open jre 8 on alpine 3.9
-FROM openjdk:8-jre-alpine3.9
+FROM openjdk:11-jdk-buster
 
 # to pass the MASTER_KEY to the environment of the running container
 ARG db_master_key
