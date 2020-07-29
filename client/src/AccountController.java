@@ -68,7 +68,7 @@ public class AccountController implements Initializable {
             showError("Please select an account first");
         else if (!isPositiveNumber(amount))
             showError("Illegal amount entered");
-        else if (BankClient.deposit(activeAccount.getName(), amount)) {
+        else if (BankClient.withdraw(activeAccount.getName(), amount)) {
             populateAccounts();
             showMessage("You have now " + amount
                     + " units of virtual currency in your pocket. Enjoy!");
