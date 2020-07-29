@@ -8,13 +8,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.paint.Color;
 
 public class AccountController implements Initializable {
 
@@ -205,6 +208,42 @@ public class AccountController implements Initializable {
                 cellData -> cellData.getValue().balanceProperty());
         descriptionColumn.setCellValueFactory(
                 cellData -> cellData.getValue().descriptionProperty());
+
+        // Set the format for amounts
+        amountColumn.setCellFactory(
+                tableColumn -> new TableCell<AccountModel.Transaction, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        if (item == null || empty || item.isEmpty()) {
+                            setText(null);
+                        } else if (item.matches("^\\-.*")) {
+                            setText(item);
+                            setTextFill(Color.RED);
+                            setAlignment(Pos.BASELINE_RIGHT);
+                        } else {
+                            setText(item);
+                            setTextFill(Color.BLACK);
+                            setAlignment(Pos.BASELINE_RIGHT);
+                        }
+
+                    }
+                });
+
+        // Set the format for balance
+        balanceColumn.setCellFactory(
+                tableColumn -> new TableCell<AccountModel.Transaction, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        if (item == null || empty || item.isEmpty()) {
+                            setText(null);
+                        } else {
+                            setText(item);
+                            setTextFill(Color.BLACK);
+                            setAlignment(Pos.BASELINE_RIGHT);
+                        }
+
+                    }
+                });
 
         // Add a listener for selection change
         listViewAccounts.getSelectionModel()
