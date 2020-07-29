@@ -120,6 +120,51 @@ public class BankClient {
         return retrieved;
     }
 
+    // To create a new account
+    public static boolean newAccount(String accountname) {
+
+        bankOut.println("ADDACCOUNT " + accountname);
+
+        String line = "";
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+            }
+        } catch (IOException e) {
+            printTrace("Exception in method createAccount");
+        }
+        return line.matches("^SUCCESS");
+    }
+
+    // To deposit money
+    public static boolean deposit(String accountname, String amount) {
+
+        bankOut.println("DEPOSIT " + accountname + " " + amount);
+
+        String line = "";
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+            }
+        } catch (IOException e) {
+            printTrace("Exception in method deposit");
+        }
+        return line.matches("^SUCCESS");
+    }
+
+    // To withdraw money
+    public static boolean withdraw(String accountname, String amount) {
+
+        bankOut.println("WITHDRAW " + accountname + " " + amount);
+
+        String line = "";
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+            }
+        } catch (IOException e) {
+            printTrace("Exception in method withdraw");
+        }
+        return line.matches("^SUCCESS");
+    }
+
     @Override
     @Deprecated
     protected void finalize() throws Throwable {
