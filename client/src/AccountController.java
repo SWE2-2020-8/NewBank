@@ -108,7 +108,8 @@ public class AccountController implements Initializable {
                         .filter(name -> !name.equals(activeAccount.getName()))
                         .collect(Collectors.toList());
 
-                ChoiceDialog<String> dialog2 = new ChoiceDialog<>("b", choices);
+                ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
+                        choices.get(0), choices);
                 dialog2.setTitle("Move money between accounts");
                 dialog2.setHeaderText("Move " + amount + " from account "
                         + activeAccount.getName());
