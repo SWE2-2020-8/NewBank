@@ -72,7 +72,6 @@ public class AccountController implements Initializable {
             populateAccounts();
             showMessage("You have now " + amount
                     + " units of virtual currency in your pocket. Enjoy!");
-
         } else
             showError("The transaction was denied");
     }
