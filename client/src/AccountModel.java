@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -131,7 +132,12 @@ public class AccountModel {
     }
 
     public List<Transaction> getTransactions() {
-        return this.transactions;
+
+        List<Transaction> reversedTransactionList = new ArrayList<>();
+        this.transactions.stream()
+                .forEach(transaction -> reversedTransactionList.add(0,
+                        transaction));
+        return reversedTransactionList;
     }
 
     @Override

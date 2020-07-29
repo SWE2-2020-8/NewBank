@@ -18,11 +18,16 @@ import javafx.scene.control.TextInputDialog;
 
 public class AccountController implements Initializable {
 
+    // Will hold the latest active account
+    AccountModel activeAccount;
+
+    // The listview
     @FXML
     private ListView<AccountModel> listViewAccounts;
     private ObservableList<AccountModel> accountList = FXCollections
             .observableArrayList();
 
+    // The tableview and some params
     @FXML
     private TableView<AccountModel.Transaction> transactionTable;
     private ObservableList<AccountModel.Transaction> transactionList = FXCollections
@@ -127,9 +132,18 @@ public class AccountController implements Initializable {
             showError("Cannot create an account with an empty name");
         else if (name.length() < 4)
             showError("The name of the account is too short");
-        else if (BankClient.newAccount(name))
+        else if (BankClient.newAccount(name)) {
             populateAccounts();
-        else
+
+            // Make the new account active
+            activeAccount = accountList.stream()
+                    .filter(account -> account.getName().equals(name))
+                    .findFirst()
+                    .get();
+
+            listViewAccounts.getSelectionModel()
+                    .clearAndSelect(accountList.indexOf(activeAccount));
+        } else
             showError("The transaction was denied");
 
     }
@@ -154,17 +168,16 @@ public class AccountController implements Initializable {
         alert.showAndWait();
     }
 
-    AccountModel activeAccount;
-
     private void populateAccounts() {
 
-        // Populate the accounts list
+        // Populate the accounts list in reverse order
         accountList.clear();
         accountList.addAll(BankClient.getAccounts());
 
         // Add it to the ListView
         listViewAccounts.setItems(accountList);
 
+        // If there was an active account, keep it active!
         if (Objects.nonNull(activeAccount)) {
             String persistName = activeAccount.getName();
             activeAccount = accountList.stream()
@@ -174,14 +187,14 @@ public class AccountController implements Initializable {
 
             listViewAccounts.getSelectionModel()
                     .clearAndSelect(accountList.indexOf(activeAccount));
-        }
+
+        } else if (!accountList.isEmpty())
+            // First one by default
+            listViewAccounts.getSelectionModel().select(0);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        // Populate accounts
-        populateAccounts();
 
         // Set the columns
         dateColumn.setCellValueFactory(
@@ -210,7 +223,14 @@ public class AccountController implements Initializable {
                     transactionList.clear();
                     transactionList.addAll(newValue.getTransactions());
                     transactionTable.setItems(transactionList);
+
+                    // Placeholder
+                    transactionTable.setPlaceholder(
+                            new Label("No transactions to display"));
                 });
+
+        // Populate accounts
+        populateAccounts();
 
     }
 }
