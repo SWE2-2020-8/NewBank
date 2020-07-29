@@ -165,6 +165,22 @@ public class BankClient {
         return line.matches("^SUCCESS");
     }
 
+    // To move money from account to account
+    public static boolean move(String amount, String accountname,
+            String toAccount) {
+
+        bankOut.println("MOVE " + amount + " " + accountname + " " + toAccount);
+
+        String line = "";
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+            }
+        } catch (IOException e) {
+            printTrace("Exception in method withdraw");
+        }
+        return line.matches("^SUCCESS");
+    }
+
     @Override
     @Deprecated
     protected void finalize() throws Throwable {

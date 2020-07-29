@@ -1,7 +1,9 @@
 
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
@@ -53,27 +56,30 @@ public class AccountController implements Initializable {
     @FXML
     private Label detailOwner;
 
+    // To withdraw money (needs to be tested)
     @FXML
     private void handleWithdraw(ActionEvent event) {
-        System.err.println(event);
-
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Withdraw money from your account");
-        dialog.setHeaderText(
-                "Withdraw money from your account " + activeAccount);
-        dialog.setContentText("Please enter the amount to withdraw:");
-        String amount = dialog.showAndWait().orElse("");
 
         if (Objects.isNull(activeAccount))
-            showError("Please select an account first");
-        else if (!isPositiveNumber(amount))
-            showError("Illegal amount entered");
-        else if (BankClient.withdraw(activeAccount.getName(), amount)) {
-            populateAccounts();
-            showMessage("You have now " + amount
-                    + " units of virtual currency in your pocket. Enjoy!");
-        } else
-            showError("The transaction was denied");
+            showError("Please create an account first");
+        else {
+
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Withdraw money from your account");
+            dialog.setHeaderText(
+                    "Withdraw money from your account " + activeAccount);
+            dialog.setContentText("Please enter the amount to withdraw:");
+            String amount = dialog.showAndWait().orElse("");
+
+            if (!isPositiveNumber(amount))
+                showError("Illegal amount entered");
+            else if (BankClient.withdraw(activeAccount.getName(), amount)) {
+                populateAccounts();
+                showMessage("You have now an additional " + amount
+                        + " units of virtual currency in your pocket. Enjoy!");
+            } else
+                showError("");
+        }
     }
 
     @FXML
@@ -81,32 +87,77 @@ public class AccountController implements Initializable {
         System.err.println(event);
     }
 
+    // Move between accounts
     @FXML
     private void handleMove(ActionEvent event) {
-        System.err.println(event);
+
+        if (accountList.size() < 2)
+            showError("Please create at least two accounts to move money");
+        else {
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Move money between accounts");
+            dialog.setHeaderText(
+                    "Move money from account " + activeAccount.getName());
+            dialog.setContentText("Please enter the amount to move:");
+            String amount = dialog.showAndWait().orElse("");
+
+            if (isPositiveNumber(amount)) {
+
+                List<String> choices = accountList.stream()
+                        .map(AccountModel::getName)
+                        .filter(name -> !name.equals(activeAccount.getName()))
+                        .collect(Collectors.toList());
+
+                ChoiceDialog<String> dialog2 = new ChoiceDialog<>("b", choices);
+                dialog2.setTitle("Move money between accounts");
+                dialog2.setHeaderText("Move " + amount + " from account "
+                        + activeAccount.getName());
+                dialog2.setContentText("Please choose destination account:");
+
+                String toAccount = dialog2.showAndWait().get();
+
+                if (BankClient.move(amount, activeAccount.getName(),
+                        toAccount)) {
+                    populateAccounts();
+                    showMessage("You have transferred " + amount
+                            + " between account " + activeAccount.getName()
+                            + " and account " + toAccount);
+                } else
+                    showError("");
+
+            } else
+                showError("Illegal amount entered");
+
+        }
     }
 
+    // To deposit money
     @FXML
     private void handleDeposit(ActionEvent event) {
-        System.err.println(event);
-
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Deposit money into your account");
-        dialog.setHeaderText(
-                "Deposit money into your account " + activeAccount);
-        dialog.setContentText("Please enter the amount to deposit:");
-        String amount = dialog.showAndWait().orElse("");
 
         if (Objects.isNull(activeAccount))
-            showError("Please select an account first");
-        else if (!isPositiveNumber(amount))
-            showError("Illegal amount entered");
-        else if (BankClient.deposit(activeAccount.getName(), amount))
-            populateAccounts();
-        else
-            showError("The transaction was denied");
+            showError("Please create an account first");
+        else {
+
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Deposit money into your account");
+            dialog.setHeaderText(
+                    "Deposit money into your account " + activeAccount);
+            dialog.setContentText("Please enter the amount to deposit:");
+            String amount = dialog.showAndWait().orElse("");
+
+            if (!isPositiveNumber(amount))
+                showError("Illegal amount entered");
+            else if (BankClient.deposit(activeAccount.getName(), amount)) {
+                populateAccounts();
+                showMessage("You have now deposited " + amount
+                        + " units of virtual currency from your pocket into NewBank. Thanks!");
+            } else
+                showError("");
+        }
     }
 
+    // To check if number is positive
     public static boolean isPositiveNumber(String strNum) {
         int d;
         if (strNum == null) {
@@ -120,6 +171,7 @@ public class AccountController implements Initializable {
         return d > 0;
     }
 
+    // To create a new account
     @FXML
     private void handleAccount(ActionEvent event) {
         System.err.println(event);
@@ -146,30 +198,33 @@ public class AccountController implements Initializable {
             listViewAccounts.getSelectionModel()
                     .clearAndSelect(accountList.indexOf(activeAccount));
         } else
-            showError("The transaction was denied");
+            showError("");
 
     }
 
+    // Show an error message
     private void showError(String message) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Operation error");
         alert.setHeaderText("Error in NewBank transaction");
         alert.setContentText(message.equals("")
-                ? "We are sorry, but the transaction wasn't successful"
+                ? "We are sorry, but the transaction wasn't successful: the transaction was denied by the bank server"
                 : message);
         alert.showAndWait();
     }
 
+    // Show a message
     private void showMessage(String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Information message");
         alert.setHeaderText("Information message");
-        alert.setContentText(
-                message.equals("") ? "The transaction was successful"
-                        : message);
+        alert.setContentText(message.equals("")
+                ? "The transaction was successful: the transaction was confirmed by the bank server"
+                : message);
         alert.showAndWait();
     }
 
+    // Get the accounts from the server and populate them
     private void populateAccounts() {
 
         // Populate the accounts list in reverse order
@@ -239,6 +294,7 @@ public class AccountController implements Initializable {
                             setText(item);
                             setTextFill(Color.BLACK);
                             setAlignment(Pos.BASELINE_RIGHT);
+
                         }
 
                     }
