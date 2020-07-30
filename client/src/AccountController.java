@@ -2,6 +2,7 @@
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -10,17 +11,25 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 public class AccountController implements Initializable {
 
@@ -55,6 +64,86 @@ public class AccountController implements Initializable {
 
     @FXML
     private Label detailOwner;
+
+    @FXML
+    private void handleUser(MouseEvent event) {
+
+        // All users, do something different for admin
+        changePassword();
+    }
+
+    private void changePassword() {
+
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Change NewBank password");
+        dialog.setHeaderText("Change your NewBank password");
+
+        // Set the icon (must be included in the project).
+        // dialog.setGraphic(new ImageView(
+        // this.getClass().getResource("login.png").toString()));
+
+        // Set the button types.
+        ButtonType changePasswordButtonType = new ButtonType("Change Password",
+                ButtonData.OK_DONE);
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(changePasswordButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        PasswordField passwordo = new PasswordField();
+        passwordo.setPromptText("Current Password");
+        PasswordField passwordn1 = new PasswordField();
+        passwordn1.setPromptText("New Password");
+        PasswordField passwordn2 = new PasswordField();
+        passwordn2.setPromptText("Retype New Password");
+
+        grid.add(new Label("Old Password:"), 0, 0);
+        grid.add(passwordo, 1, 0);
+        grid.add(new Label("New Password:"), 0, 1);
+        grid.add(passwordn1, 1, 1);
+        grid.add(new Label("Retype New Password:"), 0, 2);
+        grid.add(passwordn2, 1, 2);
+
+        // // Enable/Disable login button depending on whether a username was
+        // // entered.
+        // Node loginButton =
+        // dialog.getDialogPane().lookupButton(loginButtonType);
+        // loginButton.setDisable(true);
+
+        // // Do some validation (using the Java 8 lambda syntax).
+        // username.textProperty()
+        // .addListener((observable, oldValue, newValue) -> {
+        // loginButton.setDisable(newValue.trim().isEmpty());
+        // });
+
+        dialog.getDialogPane().setContent(grid);
+
+        // // Request focus on the username field by default.
+        // Platform.runLater(() -> username.requestFocus());
+
+        // Convert the result to a username-password-pair when the login button
+        // is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == changePasswordButtonType
+                    && passwordn1.getText().equals(passwordn2.getText())) {
+                return new Pair<>(passwordo.getText(), passwordn1.getText());
+            }
+            return null;
+        });
+
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        result.ifPresent(usernamePassword -> {
+            System.out.println("Username=" + passwordo.getText() + ", Password="
+                    + passwordn1.getText() + "=" + passwordn2.getText());
+        });
+    }
 
     // To withdraw money (needs to be tested)
     @FXML
