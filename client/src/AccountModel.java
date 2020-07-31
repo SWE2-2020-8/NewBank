@@ -35,8 +35,6 @@ public class AccountModel {
             this.balance.setValue(balance);
             this.description.setValue(description);
             this.date.setValue(date);
-
-            System.err.println(this);
         }
 
         @Override
@@ -159,5 +157,4 @@ public class AccountModel {
     public int hashCode() {
         return Objects.hash(name);
     }
-
 }
