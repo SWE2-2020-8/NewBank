@@ -124,9 +124,6 @@ public class AccountController implements Initializable {
 
         dialog.getDialogPane().setContent(grid);
 
-        // // Request focus on the username field by default.
-        // Platform.runLater(() -> username.requestFocus());
-
         // Convert the result to a username-password-pair when the login button
         // is clicked.
         dialog.setResultConverter(dialogButton -> {
@@ -138,11 +135,12 @@ public class AccountController implements Initializable {
         });
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
+        if (result.isPresent() && BankClient
+                .changePassword(result.get().getKey(), result.get().getValue()))
+            showMessage("Password has been changed");
+        else
+            showError("Password was not changed");
 
-        result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + passwordo.getText() + ", Password="
-                    + passwordn1.getText() + "=" + passwordn2.getText());
-        });
     }
 
     // To withdraw money (needs to be tested)

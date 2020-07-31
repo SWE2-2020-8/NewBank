@@ -165,7 +165,7 @@ public class BankClient {
     }
 
     // To list accounts
-    public static List<AccountModel> listUsers() {
+    public static List<AccountModel> listAccounts() {
 
         bankOut.println("LISTACCOUNTS");
         return parseAccounts();

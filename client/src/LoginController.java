@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,11 +32,9 @@ public class LoginController implements Initializable {
 
         boolean success = BankClient.bankLogin(textField.getText(),
                 passwordField.getText());
-
         label.setText(success ? "Connected" : "Login failed, try again");
 
         if (success) {
-
             Parent root;
             try {
                 root = FXMLLoader.load(
@@ -50,9 +49,7 @@ public class LoginController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-
     }
 
     @FXML
@@ -64,6 +61,10 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        // Make the connection with the bank server
         BankClient.connect("swe2-2020-8.southeastasia.azurecontainer.io", 80);
+
+        // Request focus on the username field by default
+        Platform.runLater(() -> textField.requestFocus());
     }
 }
