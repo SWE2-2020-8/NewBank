@@ -6,15 +6,16 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
@@ -25,10 +26,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
@@ -65,6 +68,9 @@ public class AccountController implements Initializable {
 
     @FXML
     private Label detailOwner;
+
+    @FXML
+    private Button buttonAccount;
 
     @FXML
     private void handleUser(MouseEvent event) {
@@ -105,6 +111,8 @@ public class AccountController implements Initializable {
                 changePassword();
             else if (dialogButton == addUserButtonType)
                 addUser();
+            else if (dialogButton == listAccountsType)
+                listAccounts();
             return null;
         });
         dialog.showAndWait();
@@ -217,6 +225,44 @@ public class AccountController implements Initializable {
                     "New User " + result.get().getKey() + " has been created");
         else
             showError("New User could not be created");
+    }
+
+    // List all accounts
+    private void listAccounts() {
+
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("List of accounts");
+        alert.setHeaderText("List of accounts in NewBank");
+        alert.setContentText("Click below to show the list of accounts");
+
+        Label label = new Label(
+                "The following are all the accounts that are active in NewBank");
+
+        StringBuilder sb = new StringBuilder();
+        BankClient.listAccounts()
+                .stream()
+                .forEach(account -> sb
+                        .append(account.getOwner() + ": " + account.getName()
+                                + " (" + account.getBalance() + ")" + "\n"));
+
+        TextArea textArea = new TextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        alert.showAndWait();
     }
 
     // To withdraw money (needs to be tested)
@@ -419,12 +465,16 @@ public class AccountController implements Initializable {
         // Set the columns
         dateColumn.setCellValueFactory(
                 cellData -> cellData.getValue().dateProperty());
+        dateColumn.setStyle("-fx-alignment: BOTTOM-LEFT;");
         amountColumn.setCellValueFactory(
                 cellData -> cellData.getValue().amountProperty());
+        amountColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
         balanceColumn.setCellValueFactory(
                 cellData -> cellData.getValue().balanceProperty());
+        balanceColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
         descriptionColumn.setCellValueFactory(
                 cellData -> cellData.getValue().descriptionProperty());
+        descriptionColumn.setStyle("-fx-alignment: BOTTOM-LEFT;");
 
         // Set the format for amounts
         amountColumn.setCellFactory(
@@ -436,30 +486,10 @@ public class AccountController implements Initializable {
                         } else if (item.matches("^\\-.*")) {
                             setText(item);
                             setTextFill(Color.RED);
-                            setAlignment(Pos.BASELINE_RIGHT);
                         } else {
                             setText(item);
                             setTextFill(Color.BLACK);
-                            setAlignment(Pos.BASELINE_RIGHT);
                         }
-
-                    }
-                });
-
-        // Set the format for balance
-        balanceColumn.setCellFactory(
-                tableColumn -> new TableCell<AccountModel.Transaction, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        if (item == null || empty || item.isEmpty()) {
-                            setText(null);
-                        } else {
-                            setText(item);
-                            setTextFill(Color.BLACK);
-                            setAlignment(Pos.BASELINE_RIGHT);
-
-                        }
-
                     }
                 });
 
@@ -474,7 +504,6 @@ public class AccountController implements Initializable {
                     // Details section
                     detailName.setText(newValue.getName());
                     detailBalance.setText(newValue.getBalance());
-                    detailOwner.setText(newValue.getOwner());
 
                     // Transaction table
                     transactionList.clear();
@@ -486,8 +515,14 @@ public class AccountController implements Initializable {
                             new Label("No transactions to display"));
                 });
 
+        // Write the username
+        detailOwner.setText(BankClient.getUsername());
+
         // Populate accounts
         populateAccounts();
 
+        // If no accounts, highlight the new account button:
+        if (accountList.isEmpty())
+            Platform.runLater(() -> buttonAccount.requestFocus());
     }
 }

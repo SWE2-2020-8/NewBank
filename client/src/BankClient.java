@@ -71,29 +71,49 @@ public class BankClient {
         Pattern p = Pattern.compile(
                 "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?\\d*.\\d*)#\\[(.*)\\]\\>$");
         String line = "";
+        System.err.print(BankClient.class.getName() + ": Accounts ");
         try {
             while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-
-                System.err.println(line);
-                Matcher m = p.matcher(line);
-                if (m.find())
-                    retrieved.add(new AccountModel(m.group(1), m.group(2),
-                            m.group(3), m.group(4)));
-                else
-                    System.err.println("Account element discarded");
+                if (!line.matches("^//.*")) {
+                    Matcher m = p.matcher(line);
+                    if (m.find()) {
+                        retrieved.add(new AccountModel(m.group(1), m.group(2),
+                                m.group(3), m.group(4)));
+                        System.err.print("v");
+                    } else
+                        System.err.print("x");
+                }
             }
         } catch (IOException e) {
             printTrace("Exception trying to parse accounts");
         }
+        System.err.println();
         return retrieved;
     }
 
     // To parse the server output for a list of users
     private static List<Pair<String, String>> parseUsers() {
 
-        // TBD
-
-        return null;
+        List<Pair<String, String>> retrieved = new ArrayList<>();
+        Pattern p = Pattern.compile("^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)\\>$");
+        String line = "";
+        System.err.print(BankClient.class.getName() + ": Users ");
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+                if (!line.matches("^//.*")) {
+                    Matcher m = p.matcher(line);
+                    if (m.find()) {
+                        retrieved.add(new Pair<>(m.group(1), m.group(2)));
+                        System.err.print("v");
+                    } else
+                        System.err.print("x");
+                }
+            }
+        } catch (IOException e) {
+            printTrace("Exception trying to parse accounts");
+        }
+        System.err.println();
+        return retrieved;
     }
 
     // To login
@@ -117,6 +137,12 @@ public class BankClient {
     public static boolean isAdmin() {
 
         return BankClient.userName.equals("Admin");
+    }
+
+    // Get if the logged user is Admin
+    public static String getUsername() {
+
+        return BankClient.userName;
     }
 
     // To get accounts
