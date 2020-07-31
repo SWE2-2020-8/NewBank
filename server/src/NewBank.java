@@ -362,26 +362,27 @@ public class NewBank {
 
         System.err.println(this.getClass().getName() + ": "
                 + customer.getUserName() + " " + message);
-	}
-	
-	/*
-	* Auxiliary method to check username validity
-	*/
-	private boolean isUserNameValid(String str) {
-		return str.matches("^[a-zA-Z0-9]{4,}$");
-	}
+    }
 
-	/*
-	* Auxiliary method to check account validity
-	*/
-	private boolean isAccountNameValid(String str) {
-		return str.matches("^[a-zA-Z0-9.,-+ _]{4,}$");
-	}
+    /*
+     * Auxiliary method to check username validity
+     */
+    private boolean isUserNameValid(String str) {
+        return str.matches("^[a-zA-Z0-9]{4,}$");
+    }
 
-	/*
-	* Auxiliary method to check password validity
-	*/
-	// private boolean isPasswordValid(String str) {
-	// 	return str.matches("^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!#$%&'()*+,-./:;<=>?@[]^_`{|}~])[a-zA-Z0-9!#$%&'()*+,-./:;<=>?@[]^_`{|}~]{8,}$");
-	// }
+    /*
+     * Auxiliary method to check account validity
+     */
+    private boolean isAccountNameValid(String str) {
+        return str.matches("^[a-zA-Z0-9\\.\\,\\-\\+ _]{4,}$");
+    }
+
+    /*
+     * Auxiliary method to check password validity
+     */
+    // private boolean isPasswordValid(String str) {
+    // return
+    // str.matches("^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!#$%&'()*+,-./:;<=>?@[]^_`{|}~])[a-zA-Z0-9!#$%&'()*+,-./:;<=>?@[]^_`{|}~]{8,}$");
+    // }
 }
