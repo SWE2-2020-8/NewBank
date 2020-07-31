@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.util.Pair;
+
 public class BankClient {
 
     // initialize socket and input output streams
@@ -20,49 +22,78 @@ public class BankClient {
     private static PrintWriter bankOut = null;
     private static BufferedReader bankIn = null;
 
-    // To properly use the bankIn stream
-    private static Predicate<String> dataInBuffer = line -> {
-        try {
-            return bankIn.ready();
-        } catch (IOException i) {
-            return false;
-        }
-    };
-
     // To match the success string
     private static Predicate<String> isSuccess = line -> line
             .matches("^SUCCESS");
 
-    // To match the fail string
-    private static Predicate<String> isFail = line -> line.matches("^FAIL");
-
-    // Response not complete
+    // Response not complete check
     private static Predicate<String> responseNotComplete = line -> line
             .matches("^(?!SUCCESS|FAIL).+");
 
-    // constructor not allowed
+    // constructor not allowed outside
     private BankClient() {
-    };
+    }
 
-    // To connect
+    // To establish a connection
     public static void connect(String address, int port) {
-        // establish a connection
         try {
             socket = new Socket(address, port);
-
             // sends output to the socket
             bankOut = new PrintWriter(socket.getOutputStream(), true);
-
             // Gets input from the socket
             bankIn = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
-
         } catch (UnknownHostException u) {
             System.out.println(u);
         } catch (IOException i) {
             System.out.println(i);
         }
-        printTrace("Connected");
+        printTrace("Connected to server");
+    }
+
+    // Parses the server output until it gets outcome
+    private static boolean parseServerOutcome() {
+
+        String line = "";
+        try {
+            while (responseNotComplete.test(line = bankIn.readLine()))
+                ;
+        } catch (IOException e) {
+            printTrace("Exception trying to parse server output");
+        }
+        return isSuccess.test(line);
+    }
+
+    // Parses the server output for a list of accounts
+    private static List<AccountModel> parseAccounts() {
+
+        List<AccountModel> retrieved = new ArrayList<>();
+        Pattern p = Pattern.compile(
+                "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?\\d*.\\d*)#\\[(.*)\\]\\>$");
+        String line = "";
+        try {
+            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
+
+                System.err.println(line);
+                Matcher m = p.matcher(line);
+                if (m.find())
+                    retrieved.add(new AccountModel(m.group(1), m.group(2),
+                            m.group(3), m.group(4)));
+                else
+                    System.err.println("Account element discarded");
+            }
+        } catch (IOException e) {
+            printTrace("Exception trying to parse accounts");
+        }
+        return retrieved;
+    }
+
+    // To parse the server output for a list of users
+    private static List<Pair<String, String>> parseUsers() {
+
+        // TBD
+
+        return null;
     }
 
     // To login
@@ -71,16 +102,7 @@ public class BankClient {
         bankOut.println(username);
         bankOut.println(password);
 
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+"))
-                ;
-        } catch (IOException e) {
-            printTrace("Exception in method bankLogin");
-        }
-
-        BankClient.loggedIn = isSuccess.test(line);
-
+        BankClient.loggedIn = parseServerOutcome();
         printTrace("Authenticated = " + BankClient.loggedIn);
         return BankClient.loggedIn;
     }
@@ -88,81 +110,29 @@ public class BankClient {
     // To get accounts
     public static List<AccountModel> getAccounts() {
 
-        List<AccountModel> retrieved = new ArrayList<>();
-
         bankOut.println("SHOWMYACCOUNTS");
-        Pattern p = Pattern.compile(
-                "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?\\d*.\\d*)#\\[(.*)\\]\\>$");
-
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-
-                System.err.println(line);
-                Matcher m = p.matcher(line);
-                if (m.find()) {
-
-                    // // print the group out for verification
-                    // System.out.println(
-                    // "Retrieved: " + m.group(1) + "\t" + m.group(2)
-                    // + "\t" + m.group(3) + "\t" + m.group(4));
-                    retrieved.add(new AccountModel(m.group(1), m.group(2),
-                            m.group(3), m.group(4)));
-
-                } else {
-                    System.err.println("Discarded");
-                }
-            }
-
-        } catch (IOException e) {
-            printTrace("Exception in method getAccounts");
-        }
-        return retrieved;
+        return parseAccounts();
     }
 
     // To create a new account
     public static boolean newAccount(String accountname) {
 
         bankOut.println("ADDACCOUNT " + accountname);
-
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-            }
-        } catch (IOException e) {
-            printTrace("Exception in method createAccount");
-        }
-        return line.matches("^SUCCESS");
+        return parseServerOutcome();
     }
 
     // To deposit money
     public static boolean deposit(String accountname, String amount) {
 
         bankOut.println("DEPOSIT " + accountname + " " + amount);
-
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-            }
-        } catch (IOException e) {
-            printTrace("Exception in method deposit");
-        }
-        return line.matches("^SUCCESS");
+        return parseServerOutcome();
     }
 
     // To withdraw money
     public static boolean withdraw(String accountname, String amount) {
 
         bankOut.println("WITHDRAW " + accountname + " " + amount);
-
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-            }
-        } catch (IOException e) {
-            printTrace("Exception in method withdraw");
-        }
-        return line.matches("^SUCCESS");
+        return parseServerOutcome();
     }
 
     // To move money from account to account
@@ -170,15 +140,35 @@ public class BankClient {
             String toAccount) {
 
         bankOut.println("MOVE " + amount + " " + accountname + " " + toAccount);
+        return parseServerOutcome();
+    }
 
-        String line = "";
-        try {
-            while ((line = bankIn.readLine()).matches("^(?!SUCCESS|FAIL).+")) {
-            }
-        } catch (IOException e) {
-            printTrace("Exception in method withdraw");
-        }
-        return line.matches("^SUCCESS");
+    // To change password
+    public static boolean changePassword(String oldPass, String newPass) {
+
+        bankOut.println("CHANGEPASSWORD " + oldPass + " " + newPass);
+        return parseServerOutcome();
+    }
+
+    // To add user
+    public static boolean addUser(String username, String password) {
+
+        bankOut.println("ADDUSER " + username + " " + password);
+        return parseServerOutcome();
+    }
+
+    // To list users
+    public static List<Pair<String, String>> listUsers() {
+
+        bankOut.println("LISTUSERS");
+        return parseUsers();
+    }
+
+    // To list accounts
+    public static List<AccountModel> listUsers() {
+
+        bankOut.println("LISTACCOUNTS");
+        return parseAccounts();
     }
 
     @Override
