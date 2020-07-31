@@ -19,12 +19,11 @@
         <name>NewBank</name>
     </organization>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-maven-archetypes -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-archetype-fxml -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-maven-archetypes</artifactId>
+            <artifactId>javafx-archetype-fxml</artifactId>
             <version>0.0.5</version>
-            <type>pom</type>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
         <dependency>
@@ -38,23 +37,23 @@
             <artifactId>javafx-fxml</artifactId>
             <version>14.0.2</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/javafx-packager/javafx-packager -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
-            <version>11</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>14.0.2.1</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
-            <version>11</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>14.0.2.1</version>
             <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics </artifactId>
-            <version>11</version>
+            <version>14.0.2.1</version>
             <classifier>mac</classifier>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome-pack -->

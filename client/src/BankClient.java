@@ -181,6 +181,14 @@ public class BankClient {
         return parseServerOutcome();
     }
 
+    // To move pay another user (needs changes in server)
+    public static boolean pay(String amount, String accountname,
+            String toUser) {
+
+        bankOut.println("PAY " + amount + " " + accountname + " " + toUser);
+        return parseServerOutcome();
+    }
+
     // To change password
     public static boolean changePassword(String oldPass, String newPass) {
 

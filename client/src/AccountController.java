@@ -127,6 +127,8 @@ public class AccountController implements Initializable {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Change NewBank password");
         dialog.setHeaderText("Change your NewBank password");
+        dialog.setContentText(
+                "To change the password you need to type the current password plus the new one twice below");
 
         // Set the button types.
         ButtonType changePasswordButtonType = new ButtonType("Change Password",
@@ -171,9 +173,9 @@ public class AccountController implements Initializable {
         Optional<Pair<String, String>> result = dialog.showAndWait();
         if (result.isPresent() && BankClient
                 .changePassword(result.get().getKey(), result.get().getValue()))
-            showMessage("Password has been changed");
+            showMessage("Password has been successfully changed");
         else
-            showError("Password was not changed");
+            showError("There was an error and the password was not changed");
     }
 
     // To add a user
@@ -183,7 +185,10 @@ public class AccountController implements Initializable {
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Create a new NewBank user");
-        dialog.setHeaderText("Create a NewBank user");
+        dialog.setHeaderText(
+                "Admin reserved function: Create a new NewBank user");
+        dialog.setContentText(
+                "To create a new NewBank user you need to specify both Username and Password");
 
         // Set the button types.
         ButtonType createUserButtonType = new ButtonType(
@@ -233,9 +238,10 @@ public class AccountController implements Initializable {
     private void listUsers() {
 
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("List of users");
-        alert.setHeaderText("List of users in NewBank");
-        alert.setContentText("Click below to show the list of users");
+        alert.setTitle("List of NewBank users");
+        alert.setHeaderText("Admin reserved function: List all NewBank users");
+        alert.setContentText(
+                "Admin reserved function: Expand the control below to show the list of all users");
 
         Label label = new Label(
                 "The following are all the users that are active in NewBank with their password");
@@ -270,9 +276,10 @@ public class AccountController implements Initializable {
     private void listAccounts() {
 
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("List of accounts");
+        alert.setTitle("List of NewBank accounts");
         alert.setHeaderText("List of accounts in NewBank");
-        alert.setContentText("Click below to show the list of accounts");
+        alert.setContentText(
+                "Admin reserved function: Expand the control below to show the list of all accounts");
 
         Label label = new Label(
                 "The following are all the accounts that are active in NewBank with their balance");
@@ -309,13 +316,14 @@ public class AccountController implements Initializable {
     private void handleWithdraw(ActionEvent event) {
 
         if (Objects.isNull(activeAccount))
-            showError("Please create an account first");
+            showError(
+                    "To withdraw money, you need to first create an account and have money in it");
         else {
 
             TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Withdraw money from your account");
-            dialog.setHeaderText(
-                    "Withdraw money from your account " + activeAccount);
+            dialog.setTitle("Withdraw money from your NewBank account");
+            dialog.setHeaderText("Withdraw money from your NewBank account "
+                    + activeAccount);
             dialog.setContentText("Please enter the amount to withdraw:");
             String amount = dialog.showAndWait().orElse("");
 
@@ -332,7 +340,47 @@ public class AccountController implements Initializable {
 
     @FXML
     private void handleTransfer(ActionEvent event) {
-        System.err.println(event);
+
+        if (accountList.size() < 1)
+            showError(
+                    "To pay or transfer money to other users, please create an account and have money in it first");
+        else {
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Pay another NewBank user");
+            dialog.setHeaderText(
+                    "Pay or transfer money to another NewBank user using your account "
+                            + activeAccount.getName());
+            dialog.setContentText(
+                    "Please enter the amount to pay to another user:");
+            String amount = dialog.showAndWait().orElse("");
+
+            if (isPositiveNumber(amount)) {
+
+                List<String> choices = BankClient.listUsers()
+                        .stream()
+                        .map(Pair::getKey)
+                        .filter(name -> !name.equals(BankClient.getUsername()))
+                        .collect(Collectors.toList());
+
+                ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
+                        choices.get(0), choices);
+                dialog2.setTitle("Pay another NewBank user");
+                dialog2.setHeaderText("Pay " + amount + " from account "
+                        + activeAccount.getName());
+                dialog2.setContentText(
+                        "Please choose the user to transfer the money to:");
+                String toUser = dialog2.showAndWait().get();
+
+                if (BankClient.pay(amount, activeAccount.getName(), toUser)) {
+                    populateAccounts();
+                    showMessage("You have transferred " + amount
+                            + " between account " + activeAccount.getName()
+                            + " and user " + toUser);
+                } else
+                    showError("");
+            } else
+                showError("Sorry, an illegal amount has been entered");
+        }
     }
 
     // Move between accounts
@@ -343,10 +391,11 @@ public class AccountController implements Initializable {
             showError("Please create at least two accounts to move money");
         else {
             TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Move money between accounts");
+            dialog.setTitle("Move money between NewBank accounts");
             dialog.setHeaderText(
                     "Move money from account " + activeAccount.getName());
-            dialog.setContentText("Please enter the amount to move:");
+            dialog.setContentText(
+                    "Please enter the amount to move to another account:");
             String amount = dialog.showAndWait().orElse("");
 
             if (isPositiveNumber(amount)) {
@@ -362,7 +411,6 @@ public class AccountController implements Initializable {
                 dialog2.setHeaderText("Move " + amount + " from account "
                         + activeAccount.getName());
                 dialog2.setContentText("Please choose destination account:");
-
                 String toAccount = dialog2.showAndWait().get();
 
                 if (BankClient.move(amount, activeAccount.getName(),
@@ -373,10 +421,8 @@ public class AccountController implements Initializable {
                             + " and account " + toAccount);
                 } else
                     showError("");
-
             } else
-                showError("Illegal amount entered");
-
+                showError("Sorry, an illegal amount has been entered");
         }
     }
 
@@ -385,22 +431,24 @@ public class AccountController implements Initializable {
     private void handleDeposit(ActionEvent event) {
 
         if (Objects.isNull(activeAccount))
-            showError("Please create an account first");
+            showError("To deposit money, you must create an account first");
         else {
 
             TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Deposit money into your account");
+            dialog.setTitle("Deposit money into your NewBank account");
             dialog.setHeaderText(
-                    "Deposit money into your account " + activeAccount);
-            dialog.setContentText("Please enter the amount to deposit:");
+                    "Deposit money into your NewBank account " + activeAccount);
+            dialog.setContentText(
+                    "Please enter the amount to deposit into the account:");
             String amount = dialog.showAndWait().orElse("");
 
             if (!isPositiveNumber(amount))
-                showError("Illegal amount entered");
+                showError("Sorry, an illegal amount has been entered");
             else if (BankClient.deposit(activeAccount.getName(), amount)) {
                 populateAccounts();
                 showMessage("You have now deposited " + amount
-                        + " units of virtual currency from your pocket into NewBank. Thanks!");
+                        + " units of virtual currency from your pocket into your NewBank account"
+                        + activeAccount.getName() + ". Thanks!");
             } else
                 showError("");
         }
@@ -426,13 +474,13 @@ public class AccountController implements Initializable {
         System.err.println(event);
 
         TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Create a new account");
-        dialog.setHeaderText("Creating a NewBank account");
-        dialog.setContentText("Please enter the new account name:");
+        dialog.setTitle("Create a new NewBank account");
+        dialog.setHeaderText("Creating a new NewBank account");
+        dialog.setContentText("Please enter the name for the new account:");
         String name = dialog.showAndWait().orElse("");
 
         if (name.equals(""))
-            showError("Cannot create an account with an empty name");
+            showError("Sorry, cannot create an account with an empty name");
         else if (name.length() < 4)
             showError("The name of the account is too short");
         else if (BankClient.newAccount(name)) {
@@ -443,7 +491,6 @@ public class AccountController implements Initializable {
                     .filter(account -> account.getName().equals(name))
                     .findFirst()
                     .get();
-
             listViewAccounts.getSelectionModel()
                     .clearAndSelect(accountList.indexOf(activeAccount));
         } else
@@ -453,7 +500,7 @@ public class AccountController implements Initializable {
     // Show an error message
     private void showError(String message) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Operation error");
+        alert.setTitle("NewBank Operation error");
         alert.setHeaderText("Error in NewBank transaction");
         alert.setContentText(message.equals("")
                 ? "We are sorry, but the transaction wasn't successful: the transaction was denied by the bank server"
@@ -464,8 +511,8 @@ public class AccountController implements Initializable {
     // Show a message
     private void showMessage(String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Information message");
-        alert.setHeaderText("Information message");
+        alert.setTitle("NewBank Information Message");
+        alert.setHeaderText("NewBank Information Message");
         alert.setContentText(message.equals("")
                 ? "The transaction was successful: the transaction was confirmed by the bank server"
                 : message);
