@@ -157,7 +157,7 @@ public class NewBank {
      */
     private String addAccount(Customer customer, String accountName) {
 
-        if (accountName.length() > 3
+        if (isAccountNameValid(accountName)
                 && !customer.hasAccountByName(accountName)) {
 
             BankCosmosDb.createAccountDocument(
@@ -296,7 +296,7 @@ public class NewBank {
     private String addUser(Customer customer, String userName,
             String password) {
 
-        if (userName.length() > 3 && password.length() > 3
+        if (isUserNameValid(userName) && password.length() > 3
                 && customer.getUserName().equals("Admin")
                 && !Customer.isCustomer(userName)) {
 
@@ -362,6 +362,26 @@ public class NewBank {
 
         System.err.println(this.getClass().getName() + ": "
                 + customer.getUserName() + " " + message);
-    }
+	}
+	
+	/*
+	* Auxiliary method to check username validity
+	*/
+	private boolean isUserNameValid(String str) {
+		return str.matches("^[a-zA-Z0-9]{4,}$");
+	}
 
+	/*
+	* Auxiliary method to check account validity
+	*/
+	private boolean isAccountNameValid(String str) {
+		return str.matches("^[a-zA-Z0-9.,-+ _]{4,}$");
+	}
+
+	/*
+	* Auxiliary method to check password validity
+	*/
+	// private boolean isPasswordValid(String str) {
+	// 	return str.matches("^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!#$%&'()*+,-./:;<=>?@[]^_`{|}~])[a-zA-Z0-9!#$%&'()*+,-./:;<=>?@[]^_`{|}~]{8,}$");
+	// }
 }
