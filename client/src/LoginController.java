@@ -1,4 +1,14 @@
 
+/**
+ * 
+ * Controller for the Login scene
+ * 
+ * Follows the MVC pattern, this is the controller that manages the login
+ * interaction
+ * 
+ * It calls the Account scene on successful login
+ * 
+ */
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,9 +38,9 @@ public class LoginController implements Initializable {
     private PasswordField passwordField;
 
     @FXML
-    private void handleButtonAction(ActionEvent event) {
+    private void handleButtonAction(final ActionEvent event) {
 
-        boolean success = BankClient.bankLogin(textField.getText(),
+        final boolean success = BankClient.bankLogin(textField.getText(),
                 passwordField.getText());
         label.setText(success ? "Connected" : "Login failed, try again");
 
@@ -39,27 +49,27 @@ public class LoginController implements Initializable {
             try {
                 root = FXMLLoader.load(
                         getClass().getResource("/fxml/AccountScene.fxml"));
-                Stage stage = new Stage();
+                final Stage stage = new Stage();
                 stage.setTitle("Your accounts");
                 stage.setScene(new Scene(root));
                 stage.show();
                 // Hide this window
                 ((Node) (event.getSource())).getScene().getWindow().hide();
 
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
     @FXML
-    private void passwordAction(ActionEvent event) {
+    private void passwordAction(final ActionEvent event) {
 
         handleButtonAction(event);
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(final URL url, final ResourceBundle rb) {
 
         // Make the connection with the bank server
         BankClient.connect("swe2-2020-8.southeastasia.azurecontainer.io", 80);

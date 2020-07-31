@@ -1,4 +1,14 @@
 
+/**
+ * 
+ * Controller for the Account scene
+ * 
+ * Follows the MVC pattern, this is the controller that manages all the
+ * interaction with the user
+ * 
+ * 
+ */
+
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -37,19 +47,19 @@ import javafx.util.Pair;
 
 public class AccountController implements Initializable {
 
-    // Will hold the latest active account
-    AccountModel activeAccount;
+    // Re-used message
+    private static final String ILLEGAL_AMOUNT = "Sorry, an illegal amount has been entered";
 
-    // The listview
+    // The listview for the accounts
     @FXML
     private ListView<AccountModel> listViewAccounts;
-    private ObservableList<AccountModel> accountList = FXCollections
+    private final ObservableList<AccountModel> accountList = FXCollections
             .observableArrayList();
 
-    // The tableview and some params
+    // The tableview for the movements
     @FXML
     private TableView<AccountModel.Transaction> transactionTable;
-    private ObservableList<AccountModel.Transaction> transactionList = FXCollections
+    private final ObservableList<AccountModel.Transaction> transactionList = FXCollections
             .observableArrayList();
     @FXML
     private TableColumn<AccountModel.Transaction, String> dateColumn;
@@ -60,20 +70,27 @@ public class AccountController implements Initializable {
     @FXML
     private TableColumn<AccountModel.Transaction, String> descriptionColumn;
 
+    // Label with Account name
     @FXML
     private Label detailName;
 
+    // Label with Account balance
     @FXML
     private Label detailBalance;
 
+    // Label with logged user
     @FXML
     private Label detailOwner;
+    // Will hold the latest active account
+    private AccountModel activeOwner;
 
+    // Button to create account
     @FXML
     private Button buttonAccount;
 
+    // User menu, different for Admin or regular user
     @FXML
-    private void handleUser(MouseEvent event) {
+    private void handleUser(final MouseEvent event) {
 
         if (BankClient.isAdmin())
             adminMenu();
@@ -81,23 +98,24 @@ public class AccountController implements Initializable {
             changePassword();
     }
 
+    // Showing the Admin menu
     private void adminMenu() {
 
         // Create the custom dialog.
-        Dialog<Void> dialog = new Dialog<>();
+        final Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Admin menu");
         dialog.setHeaderText("NewBank Admin reserved functions");
         dialog.setContentText(
                 "Choose the Admin function to perform by choosin a button or select Close to cancel");
 
         // Set the button types.
-        ButtonType changePasswordButtonType = new ButtonType("Change Password",
+        final ButtonType changePasswordButtonType = new ButtonType(
+                "Change Password", ButtonData.OTHER);
+        final ButtonType addUserButtonType = new ButtonType("Add User",
                 ButtonData.OTHER);
-        ButtonType addUserButtonType = new ButtonType("Add User",
+        final ButtonType listUsersButtonType = new ButtonType("List Users",
                 ButtonData.OTHER);
-        ButtonType listUsersButtonType = new ButtonType("List Users",
-                ButtonData.OTHER);
-        ButtonType listAccountsType = new ButtonType("List Accounts",
+        final ButtonType listAccountsType = new ButtonType("List Accounts",
                 ButtonData.OTHER);
         dialog.getDialogPane()
                 .getButtonTypes()
@@ -124,30 +142,30 @@ public class AccountController implements Initializable {
     private void changePassword() {
 
         // Create the custom dialog.
-        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        final Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Change NewBank password");
         dialog.setHeaderText("Change your NewBank password");
         dialog.setContentText(
                 "To change the password you need to type the current password plus the new one twice below");
 
         // Set the button types.
-        ButtonType changePasswordButtonType = new ButtonType("Change Password",
-                ButtonData.OK_DONE);
+        final ButtonType changePasswordButtonType = new ButtonType(
+                "Change Password", ButtonData.OK_DONE);
         dialog.getDialogPane()
                 .getButtonTypes()
                 .addAll(changePasswordButtonType, ButtonType.CANCEL);
 
         // Create the username and password labels and fields
-        GridPane grid = new GridPane();
+        final GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        PasswordField passwordo = new PasswordField();
+        final PasswordField passwordo = new PasswordField();
         passwordo.setPromptText("Current Password");
-        PasswordField passwordn1 = new PasswordField();
+        final PasswordField passwordn1 = new PasswordField();
         passwordn1.setPromptText("New Password");
-        PasswordField passwordn2 = new PasswordField();
+        final PasswordField passwordn2 = new PasswordField();
         passwordn2.setPromptText("Retype New Password");
 
         grid.add(new Label("Old Password:"), 0, 0);
@@ -170,7 +188,7 @@ public class AccountController implements Initializable {
         });
 
         // Wait for result and check outcome
-        Optional<Pair<String, String>> result = dialog.showAndWait();
+        final Optional<Pair<String, String>> result = dialog.showAndWait();
         if (result.isPresent() && BankClient
                 .changePassword(result.get().getKey(), result.get().getValue()))
             showMessage("Password has been successfully changed");
@@ -178,12 +196,11 @@ public class AccountController implements Initializable {
             showError("There was an error and the password was not changed");
     }
 
-    // To add a user
-    // Changing the password
+    // Adding a user
     private void addUser() {
 
-        // Create the custom dialog.
-        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        // Create the custom dialog
+        final Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Create a new NewBank user");
         dialog.setHeaderText(
                 "Admin reserved function: Create a new NewBank user");
@@ -191,21 +208,21 @@ public class AccountController implements Initializable {
                 "To create a new NewBank user you need to specify both Username and Password");
 
         // Set the button types.
-        ButtonType createUserButtonType = new ButtonType(
+        final ButtonType createUserButtonType = new ButtonType(
                 "Create new NewBank User", ButtonData.OK_DONE);
         dialog.getDialogPane()
                 .getButtonTypes()
                 .addAll(createUserButtonType, ButtonType.CANCEL);
 
         // Create the username and password labels and fields
-        GridPane grid = new GridPane();
+        final GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        TextField username = new TextField();
+        final TextField username = new TextField();
         username.setPromptText("New NewBank User Username");
-        TextField password = new TextField();
+        final TextField password = new TextField();
         password.setPromptText("New NewBank User Password");
 
         grid.add(new Label("New NewBank User Username:"), 0, 0);
@@ -225,7 +242,7 @@ public class AccountController implements Initializable {
         });
 
         // Wait for result and check outcome
-        Optional<Pair<String, String>> result = dialog.showAndWait();
+        final Optional<Pair<String, String>> result = dialog.showAndWait();
         if (result.isPresent() && BankClient.addUser(result.get().getKey(),
                 result.get().getValue()))
             showMessage(
@@ -234,25 +251,25 @@ public class AccountController implements Initializable {
             showError("New User could not be created");
     }
 
-    // List all accounts
+    // Listing all accounts
     private void listUsers() {
 
-        Alert alert = new Alert(AlertType.INFORMATION);
+        // Create the alert information box
+        final Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("List of NewBank users");
         alert.setHeaderText("Admin reserved function: List all NewBank users");
         alert.setContentText(
                 "Admin reserved function: Expand the control below to show the list of all users");
-
-        Label label = new Label(
+        final Label label = new Label(
                 "The following are all the users that are active in NewBank with their password");
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         BankClient.listUsers()
                 .stream()
                 .forEach(pair -> sb.append(
                         pair.getKey() + " (" + pair.getValue() + ")" + "\n"));
 
-        TextArea textArea = new TextArea(sb.toString());
+        final TextArea textArea = new TextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setWrapText(true);
 
@@ -261,37 +278,36 @@ public class AccountController implements Initializable {
         GridPane.setVgrow(textArea, Priority.ALWAYS);
         GridPane.setHgrow(textArea, Priority.ALWAYS);
 
-        GridPane expContent = new GridPane();
+        final GridPane expContent = new GridPane();
         expContent.setMaxWidth(Double.MAX_VALUE);
         expContent.add(label, 0, 0);
         expContent.add(textArea, 0, 1);
 
-        // Set expandable Exception into the dialog pane.
         alert.getDialogPane().setExpandableContent(expContent);
-
         alert.showAndWait();
     }
 
-    // List all accounts
+    // Listing all accounts
     private void listAccounts() {
 
-        Alert alert = new Alert(AlertType.INFORMATION);
+        // Create the alert information box
+        final Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("List of NewBank accounts");
         alert.setHeaderText("List of accounts in NewBank");
         alert.setContentText(
                 "Admin reserved function: Expand the control below to show the list of all accounts");
 
-        Label label = new Label(
+        final Label label = new Label(
                 "The following are all the accounts that are active in NewBank with their balance");
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         BankClient.listAccounts()
                 .stream()
                 .forEach(account -> sb
                         .append(account.getOwner() + ": " + account.getName()
                                 + " (" + account.getBalance() + ")" + "\n"));
 
-        TextArea textArea = new TextArea(sb.toString());
+        final TextArea textArea = new TextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setWrapText(true);
 
@@ -300,36 +316,34 @@ public class AccountController implements Initializable {
         GridPane.setVgrow(textArea, Priority.ALWAYS);
         GridPane.setHgrow(textArea, Priority.ALWAYS);
 
-        GridPane expContent = new GridPane();
+        final GridPane expContent = new GridPane();
         expContent.setMaxWidth(Double.MAX_VALUE);
         expContent.add(label, 0, 0);
         expContent.add(textArea, 0, 1);
 
-        // Set expandable Exception into the dialog pane.
         alert.getDialogPane().setExpandableContent(expContent);
-
         alert.showAndWait();
     }
 
-    // To withdraw money (needs to be tested)
+    // Withdrawing money
     @FXML
-    private void handleWithdraw(ActionEvent event) {
+    private void handleWithdraw(final ActionEvent event) {
 
-        if (Objects.isNull(activeAccount))
+        if (Objects.isNull(activeOwner))
             showError(
                     "To withdraw money, you need to first create an account and have money in it");
         else {
 
-            TextInputDialog dialog = new TextInputDialog("");
+            final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Withdraw money from your NewBank account");
-            dialog.setHeaderText("Withdraw money from your NewBank account "
-                    + activeAccount);
+            dialog.setHeaderText(
+                    "Withdraw money from your NewBank account " + activeOwner);
             dialog.setContentText("Please enter the amount to withdraw:");
-            String amount = dialog.showAndWait().orElse("");
+            final String amount = dialog.showAndWait().orElse("");
 
             if (!isPositiveNumber(amount))
                 showError("Illegal amount entered");
-            else if (BankClient.withdraw(activeAccount.getName(), amount)) {
+            else if (BankClient.withdraw(activeOwner.getName(), amount)) {
                 populateAccounts();
                 showMessage("You have now an additional " + amount
                         + " units of virtual currency in your pocket. Enjoy!");
@@ -338,168 +352,170 @@ public class AccountController implements Initializable {
         }
     }
 
+    // Paying another user
     @FXML
-    private void handleTransfer(ActionEvent event) {
+    private void handleTransfer(final ActionEvent event) {
 
-        if (accountList.size() < 1)
+        if (accountList.isEmpty())
             showError(
                     "To pay or transfer money to other users, please create an account and have money in it first");
         else {
-            TextInputDialog dialog = new TextInputDialog("");
+            final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Pay another NewBank user");
             dialog.setHeaderText(
                     "Pay or transfer money to another NewBank user using your account "
-                            + activeAccount.getName());
+                            + activeOwner.getName());
             dialog.setContentText(
                     "Please enter the amount to pay to another user:");
-            String amount = dialog.showAndWait().orElse("");
+            final String amount = dialog.showAndWait().orElse("");
 
             if (isPositiveNumber(amount)) {
 
-                List<String> choices = BankClient.listUsers()
+                final List<String> choices = BankClient.listUsers()
                         .stream()
                         .map(Pair::getKey)
                         .filter(name -> !name.equals(BankClient.getUsername()))
                         .collect(Collectors.toList());
 
-                ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
+                final ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
                         choices.get(0), choices);
                 dialog2.setTitle("Pay another NewBank user");
                 dialog2.setHeaderText("Pay " + amount + " from account "
-                        + activeAccount.getName());
+                        + activeOwner.getName());
                 dialog2.setContentText(
                         "Please choose the user to transfer the money to:");
-                String toUser = dialog2.showAndWait().get();
+                final Optional<String> toUser = dialog2.showAndWait();
 
-                if (BankClient.pay(amount, activeAccount.getName(), toUser)) {
+                if (toUser.isPresent() && BankClient.pay(amount,
+                        activeOwner.getName(), toUser.get())) {
                     populateAccounts();
                     showMessage("You have transferred " + amount
-                            + " between account " + activeAccount.getName()
+                            + " between account " + activeOwner.getName()
                             + " and user " + toUser);
                 } else
                     showError("");
             } else
-                showError("Sorry, an illegal amount has been entered");
+                showError(ILLEGAL_AMOUNT);
         }
     }
 
-    // Move between accounts
+    // Moving money between accounts
     @FXML
-    private void handleMove(ActionEvent event) {
+    private void handleMove(final ActionEvent event) {
 
         if (accountList.size() < 2)
             showError("Please create at least two accounts to move money");
         else {
-            TextInputDialog dialog = new TextInputDialog("");
+            final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Move money between NewBank accounts");
             dialog.setHeaderText(
-                    "Move money from account " + activeAccount.getName());
+                    "Move money from account " + activeOwner.getName());
             dialog.setContentText(
                     "Please enter the amount to move to another account:");
-            String amount = dialog.showAndWait().orElse("");
+            final String amount = dialog.showAndWait().orElse("");
 
             if (isPositiveNumber(amount)) {
 
-                List<String> choices = accountList.stream()
+                final List<String> choices = accountList.stream()
                         .map(AccountModel::getName)
-                        .filter(name -> !name.equals(activeAccount.getName()))
+                        .filter(name -> !name.equals(activeOwner.getName()))
                         .collect(Collectors.toList());
 
-                ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
+                final ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
                         choices.get(0), choices);
                 dialog2.setTitle("Move money between accounts");
                 dialog2.setHeaderText("Move " + amount + " from account "
-                        + activeAccount.getName());
+                        + activeOwner.getName());
                 dialog2.setContentText("Please choose destination account:");
-                String toAccount = dialog2.showAndWait().get();
+                final Optional<String> toAccount = dialog2.showAndWait();
 
-                if (BankClient.move(amount, activeAccount.getName(),
-                        toAccount)) {
+                if (toAccount.isPresent() && BankClient.move(amount,
+                        activeOwner.getName(), toAccount.get())) {
                     populateAccounts();
                     showMessage("You have transferred " + amount
-                            + " between account " + activeAccount.getName()
+                            + " between account " + activeOwner.getName()
                             + " and account " + toAccount);
                 } else
                     showError("");
             } else
-                showError("Sorry, an illegal amount has been entered");
+                showError(ILLEGAL_AMOUNT);
         }
     }
 
-    // To deposit money
+    // Depositing money
     @FXML
-    private void handleDeposit(ActionEvent event) {
+    private void handleDeposit(final ActionEvent event) {
 
-        if (Objects.isNull(activeAccount))
+        if (Objects.isNull(activeOwner))
             showError("To deposit money, you must create an account first");
         else {
 
-            TextInputDialog dialog = new TextInputDialog("");
+            final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Deposit money into your NewBank account");
             dialog.setHeaderText(
-                    "Deposit money into your NewBank account " + activeAccount);
+                    "Deposit money into your NewBank account " + activeOwner);
             dialog.setContentText(
                     "Please enter the amount to deposit into the account:");
-            String amount = dialog.showAndWait().orElse("");
+            final String amount = dialog.showAndWait().orElse("");
 
             if (!isPositiveNumber(amount))
-                showError("Sorry, an illegal amount has been entered");
-            else if (BankClient.deposit(activeAccount.getName(), amount)) {
+                showError(ILLEGAL_AMOUNT);
+            else if (BankClient.deposit(activeOwner.getName(), amount)) {
                 populateAccounts();
                 showMessage("You have now deposited " + amount
                         + " units of virtual currency from your pocket into your NewBank account"
-                        + activeAccount.getName() + ". Thanks!");
+                        + activeOwner.getName() + ". Thanks!");
             } else
                 showError("");
         }
     }
 
-    // To check if number is positive
-    public static boolean isPositiveNumber(String strNum) {
+    // Checking if number is positive
+    private static boolean isPositiveNumber(final String strNum) {
         int d;
         if (strNum == null) {
             return false;
         }
         try {
             d = Integer.parseInt(strNum);
-        } catch (NumberFormatException nfe) {
+        } catch (final NumberFormatException nfe) {
             return false;
         }
         return d > 0;
     }
 
-    // To create a new account
+    // Creating a new account
     @FXML
-    private void handleAccount(ActionEvent event) {
+    private void handleAccount(final ActionEvent event) {
         System.err.println(event);
 
-        TextInputDialog dialog = new TextInputDialog("");
+        final TextInputDialog dialog = new TextInputDialog("");
         dialog.setTitle("Create a new NewBank account");
         dialog.setHeaderText("Creating a new NewBank account");
         dialog.setContentText("Please enter the name for the new account:");
-        String name = dialog.showAndWait().orElse("");
+        final String name = dialog.showAndWait().orElse("");
 
         if (name.equals(""))
             showError("Sorry, cannot create an account with an empty name");
         else if (name.length() < 4)
             showError("The name of the account is too short");
         else if (BankClient.newAccount(name)) {
-            populateAccounts();
 
-            // Make the new account active
-            activeAccount = accountList.stream()
+            // We reload and make the new account active
+            populateAccounts();
+            activeOwner = accountList.stream()
                     .filter(account -> account.getName().equals(name))
                     .findFirst()
-                    .get();
+                    .orElseThrow();
             listViewAccounts.getSelectionModel()
-                    .clearAndSelect(accountList.indexOf(activeAccount));
+                    .clearAndSelect(accountList.indexOf(activeOwner));
         } else
             showError("");
     }
 
-    // Show an error message
-    private void showError(String message) {
-        Alert alert = new Alert(AlertType.ERROR);
+    // Showing an error message
+    private void showError(final String message) {
+        final Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("NewBank Operation error");
         alert.setHeaderText("Error in NewBank transaction");
         alert.setContentText(message.equals("")
@@ -508,9 +524,9 @@ public class AccountController implements Initializable {
         alert.showAndWait();
     }
 
-    // Show a message
-    private void showMessage(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
+    // Showing a message
+    private void showMessage(final String message) {
+        final Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("NewBank Information Message");
         alert.setHeaderText("NewBank Information Message");
         alert.setContentText(message.equals("")
@@ -519,10 +535,10 @@ public class AccountController implements Initializable {
         alert.showAndWait();
     }
 
-    // Get the accounts from the server and populate them
+    // Getting accounts from the server to populate the list
     private void populateAccounts() {
 
-        // Populate the accounts list in reverse order
+        // Populate the accounts list
         accountList.clear();
         accountList.addAll(BankClient.getAccounts());
 
@@ -530,43 +546,51 @@ public class AccountController implements Initializable {
         listViewAccounts.setItems(accountList);
 
         // If there was an active account, keep it active!
-        if (Objects.nonNull(activeAccount)) {
-            String persistName = activeAccount.getName();
-            activeAccount = accountList.stream()
+        if (Objects.nonNull(activeOwner)) {
+
+            final String persistName = activeOwner.getName();
+            activeOwner = accountList.stream()
                     .filter(account -> account.getName().equals(persistName))
                     .findFirst()
-                    .get();
-
+                    .orElseThrow();
             listViewAccounts.getSelectionModel()
-                    .clearAndSelect(accountList.indexOf(activeAccount));
+                    .clearAndSelect(accountList.indexOf(activeOwner));
 
         } else if (!accountList.isEmpty())
-            // First one by default
+            // If no account is active, and the list is not empty, get the first
+            // one by default
             listViewAccounts.getSelectionModel().select(0);
+        else
+            listViewAccounts.setPlaceholder(
+                    new Label("No accounts to display, please create one"));
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(final URL url, final ResourceBundle rb) {
 
+        // For the TableColumn describing the transactions
         // Set the columns
         dateColumn.setCellValueFactory(
                 cellData -> cellData.getValue().dateProperty());
-        dateColumn.setStyle("-fx-alignment: BOTTOM-LEFT;");
         amountColumn.setCellValueFactory(
                 cellData -> cellData.getValue().amountProperty());
-        amountColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
         balanceColumn.setCellValueFactory(
                 cellData -> cellData.getValue().balanceProperty());
-        balanceColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
         descriptionColumn.setCellValueFactory(
                 cellData -> cellData.getValue().descriptionProperty());
+
+        // Set column alignment
+        dateColumn.setStyle("-fx-alignment: BOTTOM-LEFT;");
+        amountColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
+        balanceColumn.setStyle("-fx-alignment: BOTTOM-RIGHT;");
         descriptionColumn.setStyle("-fx-alignment: BOTTOM-LEFT;");
 
-        // Set the format for amounts
+        // Display negative amounts in red
         amountColumn.setCellFactory(
                 tableColumn -> new TableCell<AccountModel.Transaction, String>() {
                     @Override
-                    protected void updateItem(String item, boolean empty) {
+                    protected void updateItem(final String item,
+                            final boolean empty) {
                         if (item == null || empty || item.isEmpty()) {
                             setText(null);
                         } else if (item.matches("^\\-.*")) {
@@ -579,35 +603,35 @@ public class AccountController implements Initializable {
                     }
                 });
 
-        // Add a listener for selection change
+        // Add a listener that will update the scene when an account is selected
         listViewAccounts.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
 
                     System.err.println(newValue.toString());
-                    activeAccount = newValue;
+                    activeOwner = newValue;
 
-                    // Details section
+                    // Update account name and balance
                     detailName.setText(newValue.getName());
                     detailBalance.setText(newValue.getBalance());
 
-                    // Transaction table
+                    // Update transaction list
                     transactionList.clear();
                     transactionList.addAll(newValue.getTransactions());
                     transactionTable.setItems(transactionList);
 
-                    // Placeholder
-                    transactionTable.setPlaceholder(
-                            new Label("No transactions to display"));
+                    // Placeholder if no account and/or transactions present
+                    transactionTable.setPlaceholder(new Label(
+                            "No transactions to display: please create an account"));
                 });
 
-        // Write the username
+        // Set the username in the scene
         detailOwner.setText(BankClient.getUsername());
 
-        // Populate accounts
+        // Populate accounts list
         populateAccounts();
 
-        // If no accounts, highlight the new account button:
+        // If no accounts are present, highlight the create account button
         if (accountList.isEmpty())
             Platform.runLater(() -> buttonAccount.requestFocus());
     }

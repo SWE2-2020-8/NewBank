@@ -1,4 +1,13 @@
 
+/**
+ * 
+ * Main entry point to JavaFX
+ * 
+ * Creates the stage and calls the Login scene
+ * 
+ * 
+ */
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,11 +17,11 @@ import javafx.stage.Stage;
 public class EntryPoint extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader
+    public void start(final Stage stage) throws Exception {
+        final Parent root = FXMLLoader
                 .load(getClass().getResource("fxml/LoginScene.fxml"));
 
-        Scene scene = new Scene(root);
+        final Scene scene = new Scene(root);
         scene.getStylesheets().add("styles/Styles.css");
 
         stage.setTitle("NewBank Client");
@@ -29,7 +38,7 @@ public class EntryPoint extends Application {
      * @param args
      *             the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch(args);
     }
 
