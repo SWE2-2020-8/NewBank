@@ -111,6 +111,8 @@ public class AccountController implements Initializable {
                 changePassword();
             else if (dialogButton == addUserButtonType)
                 addUser();
+            else if (dialogButton == listUsersButtonType)
+                listUsers();
             else if (dialogButton == listAccountsType)
                 listAccounts();
             return null;
@@ -228,6 +230,43 @@ public class AccountController implements Initializable {
     }
 
     // List all accounts
+    private void listUsers() {
+
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("List of users");
+        alert.setHeaderText("List of users in NewBank");
+        alert.setContentText("Click below to show the list of users");
+
+        Label label = new Label(
+                "The following are all the users that are active in NewBank with their password");
+
+        StringBuilder sb = new StringBuilder();
+        BankClient.listUsers()
+                .stream()
+                .forEach(pair -> sb.append(
+                        pair.getKey() + " (" + pair.getValue() + ")" + "\n"));
+
+        TextArea textArea = new TextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        alert.showAndWait();
+    }
+
+    // List all accounts
     private void listAccounts() {
 
         Alert alert = new Alert(AlertType.INFORMATION);
@@ -236,7 +275,7 @@ public class AccountController implements Initializable {
         alert.setContentText("Click below to show the list of accounts");
 
         Label label = new Label(
-                "The following are all the accounts that are active in NewBank");
+                "The following are all the accounts that are active in NewBank with their balance");
 
         StringBuilder sb = new StringBuilder();
         BankClient.listAccounts()
