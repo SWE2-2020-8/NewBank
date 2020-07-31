@@ -17,7 +17,7 @@ import javafx.util.Pair;
 public class BankClient {
 
     // initialize socket and input output streams
-    private static boolean loggedIn = false;
+    private static String userName;
     private static Socket socket = null;
     private static PrintWriter bankOut = null;
     private static BufferedReader bankIn = null;
@@ -102,9 +102,21 @@ public class BankClient {
         bankOut.println(username);
         bankOut.println(password);
 
-        BankClient.loggedIn = parseServerOutcome();
-        printTrace("Authenticated = " + BankClient.loggedIn);
-        return BankClient.loggedIn;
+        if (parseServerOutcome()) {
+
+            BankClient.userName = username;
+            printTrace("Authenticated " + BankClient.userName);
+            return true;
+        } else {
+            printTrace("Authentication failed");
+            return false;
+        }
+    }
+
+    // Get if the logged user is Admin
+    public static boolean isAdmin() {
+
+        return BankClient.userName.equals("Admin");
     }
 
     // To get accounts

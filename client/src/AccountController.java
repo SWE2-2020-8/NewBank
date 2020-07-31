@@ -25,6 +25,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -68,20 +69,54 @@ public class AccountController implements Initializable {
     @FXML
     private void handleUser(MouseEvent event) {
 
-        // All users, do something different for admin
-        changePassword();
+        if (BankClient.isAdmin())
+            adminMenu();
+        else
+            changePassword();
     }
 
+    private void adminMenu() {
+
+        // Create the custom dialog.
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Admin menu");
+        dialog.setHeaderText("NewBank Admin reserved functions");
+        dialog.setContentText(
+                "Choose the Admin function to perform by choosin a button or select Close to cancel");
+
+        // Set the button types.
+        ButtonType changePasswordButtonType = new ButtonType("Change Password",
+                ButtonData.OTHER);
+        ButtonType addUserButtonType = new ButtonType("Add User",
+                ButtonData.OTHER);
+        ButtonType listUsersButtonType = new ButtonType("List Users",
+                ButtonData.OTHER);
+        ButtonType listAccountsType = new ButtonType("List Accounts",
+                ButtonData.OTHER);
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(changePasswordButtonType, addUserButtonType,
+                        listUsersButtonType, listAccountsType,
+                        ButtonType.CLOSE);
+
+        // Do the proper thing depending on button clicked
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == changePasswordButtonType)
+                changePassword();
+            else if (dialogButton == addUserButtonType)
+                addUser();
+            return null;
+        });
+        dialog.showAndWait();
+    }
+
+    // Changing the password
     private void changePassword() {
 
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Change NewBank password");
         dialog.setHeaderText("Change your NewBank password");
-
-        // Set the icon (must be included in the project).
-        // dialog.setGraphic(new ImageView(
-        // this.getClass().getResource("login.png").toString()));
 
         // Set the button types.
         ButtonType changePasswordButtonType = new ButtonType("Change Password",
@@ -90,7 +125,7 @@ public class AccountController implements Initializable {
                 .getButtonTypes()
                 .addAll(changePasswordButtonType, ButtonType.CANCEL);
 
-        // Create the username and password labels and fields.
+        // Create the username and password labels and fields
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -110,18 +145,6 @@ public class AccountController implements Initializable {
         grid.add(new Label("Retype New Password:"), 0, 2);
         grid.add(passwordn2, 1, 2);
 
-        // // Enable/Disable login button depending on whether a username was
-        // // entered.
-        // Node loginButton =
-        // dialog.getDialogPane().lookupButton(loginButtonType);
-        // loginButton.setDisable(true);
-
-        // // Do some validation (using the Java 8 lambda syntax).
-        // username.textProperty()
-        // .addListener((observable, oldValue, newValue) -> {
-        // loginButton.setDisable(newValue.trim().isEmpty());
-        // });
-
         dialog.getDialogPane().setContent(grid);
 
         // Convert the result to a username-password-pair when the login button
@@ -134,13 +157,66 @@ public class AccountController implements Initializable {
             return null;
         });
 
+        // Wait for result and check outcome
         Optional<Pair<String, String>> result = dialog.showAndWait();
         if (result.isPresent() && BankClient
                 .changePassword(result.get().getKey(), result.get().getValue()))
             showMessage("Password has been changed");
         else
             showError("Password was not changed");
+    }
 
+    // To add a user
+    // Changing the password
+    private void addUser() {
+
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Create a new NewBank user");
+        dialog.setHeaderText("Create a NewBank user");
+
+        // Set the button types.
+        ButtonType createUserButtonType = new ButtonType(
+                "Create new NewBank User", ButtonData.OK_DONE);
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(createUserButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("New NewBank User Username");
+        TextField password = new TextField();
+        password.setPromptText("New NewBank User Password");
+
+        grid.add(new Label("New NewBank User Username:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("New NewBank User Password:"), 0, 1);
+        grid.add(password, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Convert the result to a username-password-pair when the login button
+        // is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == createUserButtonType) {
+                return new Pair<>(username.getText(), password.getText());
+            }
+            return null;
+        });
+
+        // Wait for result and check outcome
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+        if (result.isPresent() && BankClient.addUser(result.get().getKey(),
+                result.get().getValue()))
+            showMessage(
+                    "New User " + result.get().getKey() + " has been created");
+        else
+            showError("New User could not be created");
     }
 
     // To withdraw money (needs to be tested)
@@ -287,7 +363,6 @@ public class AccountController implements Initializable {
                     .clearAndSelect(accountList.indexOf(activeAccount));
         } else
             showError("");
-
     }
 
     // Show an error message
