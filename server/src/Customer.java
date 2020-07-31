@@ -191,11 +191,11 @@ public class Customer {
     }
 
      /*
-     * Returns main account of client
+     * Returns first account for client
      */
-    public Account getMainAccount() {
+    public Account getClientAccount() {
         return this.getAccounts()
-                .stream().filter(account -> account.getAccountName().equals("Main"))
+                .stream()
                 .findFirst()
                 .orElse(null);
     }

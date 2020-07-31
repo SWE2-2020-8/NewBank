@@ -139,9 +139,5 @@ public class Account {
 	public double getBalance(String accountName) {
 		return this.balance;
     }
-    
-    public double getMainBalance(Account Mainclient) {
-        return this.balance;
-    }
-   
+
 }
