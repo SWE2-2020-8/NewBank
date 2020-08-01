@@ -26,6 +26,7 @@ public class BankClient {
 
     // Keep track of users and connections
     private static String userName;
+    private static Socket socket = null;
     private static PrintWriter bankOut = null;
     private static BufferedReader bankIn = null;
 
@@ -49,7 +50,10 @@ public class BankClient {
     // Setting up the connection
     public static void connect(final String address, final int port) {
 
-        try (Socket socket = new Socket(address, port)) {
+        try {
+
+            // Open the socket
+            socket = new Socket(address, port);
 
             // sends output to the socket
             bankOut = new PrintWriter(socket.getOutputStream(), true);
@@ -104,7 +108,7 @@ public class BankClient {
             while (responseNotComplete.test(line = bankIn.readLine()))
                 ;
         } catch (final IOException e) {
-            printTrace("Exception trying to parse server output");
+            printTrace("Exception trying to parse server output: " + e);
         }
         return isSuccess.test(line);
     }
@@ -129,7 +133,7 @@ public class BankClient {
                 }
             }
         } catch (final IOException e) {
-            printTrace("Exception trying to parse accounts");
+            printTrace("Exception trying to parse accounts: " + e);
         }
         System.err.println();
         return retrieved;
@@ -154,7 +158,7 @@ public class BankClient {
                 }
             }
         } catch (final IOException e) {
-            printTrace("Exception trying to parse users");
+            printTrace("Exception trying to parse users: " + e);
         }
         System.err.println();
         return retrieved;

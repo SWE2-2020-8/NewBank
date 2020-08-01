@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -47,8 +48,8 @@ import javafx.util.Pair;
 
 public class AccountController implements Initializable {
 
-    // Re-used message
-    private static final String ILLEGAL_AMOUNT = "Sorry, an illegal amount has been entered";
+    // Will hold the latest active account
+    private AccountModel activeAccount;
 
     // The listview for the accounts
     @FXML
@@ -81,8 +82,6 @@ public class AccountController implements Initializable {
     // Label with logged user
     @FXML
     private Label detailOwner;
-    // Will hold the latest active account
-    private AccountModel activeOwner;
 
     // Button to create account
     @FXML
@@ -329,21 +328,21 @@ public class AccountController implements Initializable {
     @FXML
     private void handleWithdraw(final ActionEvent event) {
 
-        if (Objects.isNull(activeOwner))
+        if (Objects.isNull(activeAccount))
             showError(
                     "To withdraw money, you need to first create an account and have money in it");
         else {
 
             final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Withdraw money from your NewBank account");
-            dialog.setHeaderText(
-                    "Withdraw money from your NewBank account " + activeOwner);
+            dialog.setHeaderText("Withdraw money from your NewBank account "
+                    + activeAccount);
             dialog.setContentText("Please enter the amount to withdraw:");
             final String amount = dialog.showAndWait().orElse("");
 
             if (!isPositiveNumber(amount))
                 showError("Illegal amount entered");
-            else if (BankClient.withdraw(activeOwner.getName(), amount)) {
+            else if (BankClient.withdraw(activeAccount.getName(), amount)) {
                 populateAccounts();
                 showMessage("You have now an additional " + amount
                         + " units of virtual currency in your pocket. Enjoy!");
@@ -364,7 +363,7 @@ public class AccountController implements Initializable {
             dialog.setTitle("Pay another NewBank user");
             dialog.setHeaderText(
                     "Pay or transfer money to another NewBank user using your account "
-                            + activeOwner.getName());
+                            + activeAccount.getName());
             dialog.setContentText(
                     "Please enter the amount to pay to another user:");
             final String amount = dialog.showAndWait().orElse("");
@@ -381,21 +380,21 @@ public class AccountController implements Initializable {
                         choices.get(0), choices);
                 dialog2.setTitle("Pay another NewBank user");
                 dialog2.setHeaderText("Pay " + amount + " from account "
-                        + activeOwner.getName());
+                        + activeAccount.getName());
                 dialog2.setContentText(
                         "Please choose the user to transfer the money to:");
                 final Optional<String> toUser = dialog2.showAndWait();
 
                 if (toUser.isPresent() && BankClient.pay(amount,
-                        activeOwner.getName(), toUser.get())) {
+                        activeAccount.getName(), toUser.get())) {
                     populateAccounts();
                     showMessage("You have transferred " + amount
-                            + " between account " + activeOwner.getName()
+                            + " between account " + activeAccount.getName()
                             + " and user " + toUser);
                 } else
                     showError("");
             } else
-                showError(ILLEGAL_AMOUNT);
+                showError(ILLEGAL_AMOUNT_MSG);
         }
     }
 
@@ -409,7 +408,7 @@ public class AccountController implements Initializable {
             final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Move money between NewBank accounts");
             dialog.setHeaderText(
-                    "Move money from account " + activeOwner.getName());
+                    "Move money from account " + activeAccount.getName());
             dialog.setContentText(
                     "Please enter the amount to move to another account:");
             final String amount = dialog.showAndWait().orElse("");
@@ -418,27 +417,27 @@ public class AccountController implements Initializable {
 
                 final List<String> choices = accountList.stream()
                         .map(AccountModel::getName)
-                        .filter(name -> !name.equals(activeOwner.getName()))
+                        .filter(name -> !name.equals(activeAccount.getName()))
                         .collect(Collectors.toList());
 
                 final ChoiceDialog<String> dialog2 = new ChoiceDialog<>(
                         choices.get(0), choices);
                 dialog2.setTitle("Move money between accounts");
                 dialog2.setHeaderText("Move " + amount + " from account "
-                        + activeOwner.getName());
+                        + activeAccount.getName());
                 dialog2.setContentText("Please choose destination account:");
                 final Optional<String> toAccount = dialog2.showAndWait();
 
                 if (toAccount.isPresent() && BankClient.move(amount,
-                        activeOwner.getName(), toAccount.get())) {
+                        activeAccount.getName(), toAccount.get())) {
                     populateAccounts();
                     showMessage("You have transferred " + amount
-                            + " between account " + activeOwner.getName()
+                            + " between account " + activeAccount.getName()
                             + " and account " + toAccount);
                 } else
                     showError("");
             } else
-                showError(ILLEGAL_AMOUNT);
+                showError(ILLEGAL_AMOUNT_MSG);
         }
     }
 
@@ -446,25 +445,25 @@ public class AccountController implements Initializable {
     @FXML
     private void handleDeposit(final ActionEvent event) {
 
-        if (Objects.isNull(activeOwner))
+        if (Objects.isNull(activeAccount))
             showError("To deposit money, you must create an account first");
         else {
 
             final TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Deposit money into your NewBank account");
             dialog.setHeaderText(
-                    "Deposit money into your NewBank account " + activeOwner);
+                    "Deposit money into your NewBank account " + activeAccount);
             dialog.setContentText(
                     "Please enter the amount to deposit into the account:");
             final String amount = dialog.showAndWait().orElse("");
 
             if (!isPositiveNumber(amount))
-                showError(ILLEGAL_AMOUNT);
-            else if (BankClient.deposit(activeOwner.getName(), amount)) {
+                showError(ILLEGAL_AMOUNT_MSG);
+            else if (BankClient.deposit(activeAccount.getName(), amount)) {
                 populateAccounts();
                 showMessage("You have now deposited " + amount
                         + " units of virtual currency from your pocket into your NewBank account"
-                        + activeOwner.getName() + ". Thanks!");
+                        + activeAccount.getName() + ". Thanks!");
             } else
                 showError("");
         }
@@ -503,36 +502,14 @@ public class AccountController implements Initializable {
 
             // We reload and make the new account active
             populateAccounts();
-            activeOwner = accountList.stream()
+            activeAccount = accountList.stream()
                     .filter(account -> account.getName().equals(name))
                     .findFirst()
                     .orElseThrow();
             listViewAccounts.getSelectionModel()
-                    .clearAndSelect(accountList.indexOf(activeOwner));
+                    .clearAndSelect(accountList.indexOf(activeAccount));
         } else
             showError("");
-    }
-
-    // Showing an error message
-    private void showError(final String message) {
-        final Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("NewBank Operation error");
-        alert.setHeaderText("Error in NewBank transaction");
-        alert.setContentText(message.equals("")
-                ? "We are sorry, but the transaction wasn't successful: the transaction was denied by the bank server"
-                : message);
-        alert.showAndWait();
-    }
-
-    // Showing a message
-    private void showMessage(final String message) {
-        final Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("NewBank Information Message");
-        alert.setHeaderText("NewBank Information Message");
-        alert.setContentText(message.equals("")
-                ? "The transaction was successful: the transaction was confirmed by the bank server"
-                : message);
-        alert.showAndWait();
     }
 
     // Getting accounts from the server to populate the list
@@ -546,15 +523,15 @@ public class AccountController implements Initializable {
         listViewAccounts.setItems(accountList);
 
         // If there was an active account, keep it active!
-        if (Objects.nonNull(activeOwner)) {
+        if (Objects.nonNull(activeAccount)) {
 
-            final String persistName = activeOwner.getName();
-            activeOwner = accountList.stream()
+            final String persistName = activeAccount.getName();
+            activeAccount = accountList.stream()
                     .filter(account -> account.getName().equals(persistName))
                     .findFirst()
                     .orElseThrow();
             listViewAccounts.getSelectionModel()
-                    .clearAndSelect(accountList.indexOf(activeOwner));
+                    .clearAndSelect(accountList.indexOf(activeAccount));
 
         } else if (!accountList.isEmpty())
             // If no account is active, and the list is not empty, get the first
@@ -608,8 +585,8 @@ public class AccountController implements Initializable {
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
 
-                    System.err.println(newValue.toString());
-                    activeOwner = newValue;
+                    // Keep active account object
+                    activeAccount = newValue;
 
                     // Update account name and balance
                     detailName.setText(newValue.getName());
@@ -619,10 +596,6 @@ public class AccountController implements Initializable {
                     transactionList.clear();
                     transactionList.addAll(newValue.getTransactions());
                     transactionTable.setItems(transactionList);
-
-                    // Placeholder if no account and/or transactions present
-                    transactionTable.setPlaceholder(new Label(
-                            "No transactions to display: please create an account"));
                 });
 
         // Set the username in the scene
@@ -631,8 +604,40 @@ public class AccountController implements Initializable {
         // Populate accounts list
         populateAccounts();
 
+        // Placeholder if no account and/or transactions present
+        transactionTable.setPlaceholder(new Label(
+                "No transactions to display: please create an account"));
+
         // If no accounts are present, highlight the create account button
         if (accountList.isEmpty())
             Platform.runLater(() -> buttonAccount.requestFocus());
+
+    }
+
+    // Standard messages
+    private static final String NEW_BANK_INFORMATION_TITLE = "NewBank Information Message";
+    private static final String SUCCESSFUL_TRANSACTION_MSG = "The transaction was successful: the transaction was confirmed by the bank server";
+    private static final String FAILED_TRANSACTION_TITLE = "Error in NewBank Transaction";
+    private static final String FAILED_TRANSACTION_MSG = "We are sorry, but the transaction wasn't successful: the transaction was denied by the bank server";
+    private static final String ILLEGAL_AMOUNT_MSG = "Sorry, an illegal amount has been entered";
+
+    // Showing an error message
+    private void showError(final String message) {
+        final Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(FAILED_TRANSACTION_TITLE);
+        alert.setHeaderText(FAILED_TRANSACTION_TITLE);
+        alert.setContentText(
+                message.equals("") ? FAILED_TRANSACTION_MSG : message);
+        alert.showAndWait();
+    }
+
+    // Showing an information message
+    private void showMessage(final String message) {
+        final Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(NEW_BANK_INFORMATION_TITLE);
+        alert.setHeaderText(NEW_BANK_INFORMATION_TITLE);
+        alert.setContentText(
+                message.equals("") ? SUCCESSFUL_TRANSACTION_MSG : message);
+        alert.showAndWait();
     }
 }
