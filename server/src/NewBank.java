@@ -136,7 +136,7 @@ public class NewBank {
         s += "// ADDACCOUNT <Account Name> : to create new account \n";
         s += "// DEPOSIT <Account Name> <Amount> : deposit money\n";
         s += "// MOVE <Amount> <From Account> <To Account> : to move money\n";
-        s += "// PAY <UserID> <Amount> <Account Name> : to transfer money\n";
+        s += "// PAY <Amount> <From Account> <To User> : to pay money\n";
         s += "// WITHDRAW <Account Name> <Amount> : Withdraw money\n";
         s += "// CHANGEPASSWORD <Old Password> <New Password> : change password\n";
         s += "// ADDUSER <UserID> <Password> : create user (only admin)\n";
@@ -224,7 +224,7 @@ public class NewBank {
 
         if (customer.hasAccountByName(accountName)
                 && customer.hasAccountByName(accountName1)
-                && amount <= account.getBalance(accountName)) {
+                && amount <= account.getBalance()) {
 
             // The transaction
             account.newTransaction(-amount, "Amount moved");
@@ -244,8 +244,7 @@ public class NewBank {
      * Pay another client (From main account to a main account)
      * 
      */
-    private String pay(Customer customer, String userName,
-            String amountString, String accountName) {
+    private String pay(Customer customer, String amountString, String accountName, String userName) {
 
         Double amount = 0.0;
 
@@ -257,10 +256,10 @@ public class NewBank {
 
         Account account = customer.getAccountByName(accountName);
         Customer client = customer.getReciverName(userName);
-        Account clientAccount = client.getClientAccount();
 
-        if (amount <= account.getBalance(accountName) && client != null) {
-
+        if (customer.theirIsReciver(userName) && customer.hasAccount() && amount <= account.getBalance() && customer.hasAccountByName(accountName)) {
+            
+            Account clientAccount = client.getFirstAccount();
             // The transaction itself
             account.newTransaction(-amount, "Paid to " + userName);
             clientAccount.newTransaction(+amount, "Transfer Received from " + customer.getUserName());
@@ -378,7 +377,7 @@ public class NewBank {
 
         Account account = customer.getAccountByName(accountName);
         
-        if (customer.hasAccountByName(accountName) && amount <= account.getBalance(accountName)) {
+        if (customer.hasAccountByName(accountName) && amount <= account.getBalance()) {
 
             // The transaction itself
             account.newTransaction(-amount, "Withdraw");

@@ -74,6 +74,14 @@ public class Customer {
                 .orElse(null);
     }
 
+      /*
+     * Check if the bank has customer by that name 
+     * 
+     */
+    public boolean HaveCustomerByName(String userName) {
+        return Objects.nonNull(this.getCustomerByName(userName));
+    }
+
     /*
      * Get the username for a customer instance
      * 
@@ -190,14 +198,30 @@ public class Customer {
         
     }
 
+    /*
+     * Check if the thier is a customer by that name
+     * 
+     */
+    public boolean theirIsReciver(String userName) {
+        return Objects.nonNull(this.getReciverName(userName));
+    }
+
      /*
      * Returns first account for client
      */
-    public Account getClientAccount() {
+    public Account getFirstAccount() {
         return this.getAccounts()
                 .stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+     /*
+     * Check if the user has an account 
+     * 
+     */
+    public boolean hasAccount() {
+        return Objects.nonNull(this.getFirstAccount());
     }
 
 

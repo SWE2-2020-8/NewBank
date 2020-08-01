@@ -136,8 +136,6 @@ public class Account {
                 + "#" + this.transactions + ">";
     }
 
-	public double getBalance(String accountName) {
-		return this.balance;
-    }
+	
 
 }
