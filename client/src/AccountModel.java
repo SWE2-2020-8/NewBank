@@ -1,4 +1,13 @@
 
+/**
+ * 
+ * Model for the Account scene
+ * 
+ * Follows the MVC pattern, this is the model that manages all the account
+ * operations
+ * 
+ * 
+ */
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,24 +22,26 @@ import javafx.util.Callback;
 
 public class AccountModel {
 
-    private StringProperty owner = new SimpleStringProperty(this, "owner", "");
-    private StringProperty name = new SimpleStringProperty(this, "name", "");
-    private StringProperty balance = new SimpleStringProperty(this, "balance",
+    private final StringProperty owner = new SimpleStringProperty(this, "owner",
             "");
-    private List<Transaction> transactions;
+    private final StringProperty name = new SimpleStringProperty(this, "name",
+            "");
+    private final StringProperty balance = new SimpleStringProperty(this,
+            "balance", "");
+    private final List<Transaction> transactions;
 
     static class Transaction {
-        private StringProperty amount = new SimpleStringProperty(this, "amount",
-                "");
-        private StringProperty balance = new SimpleStringProperty(this,
+        private final StringProperty amount = new SimpleStringProperty(this,
+                "amount", "");
+        private final StringProperty balance = new SimpleStringProperty(this,
                 "balance", "");
-        private StringProperty description = new SimpleStringProperty(this,
-                "description", "");
-        private StringProperty date = new SimpleStringProperty(this, "date",
-                "");
+        private final StringProperty description = new SimpleStringProperty(
+                this, "description", "");
+        private final StringProperty date = new SimpleStringProperty(this,
+                "date", "");
 
-        Transaction(String amount, String balance, String description,
-                String date) {
+        Transaction(final String amount, final String balance,
+                final String description, final String date) {
             this.amount.setValue(amount);
             this.balance.setValue(balance);
             this.description.setValue(description);
@@ -79,17 +90,17 @@ public class AccountModel {
     }
 
     // Constructor
-    public AccountModel(String owner, String name, String balance,
-            String transactions) {
+    public AccountModel(final String owner, final String name,
+            final String balance, final String transactions) {
 
         this.owner.set(owner);
         this.name.set(name);
         this.balance.set(balance);
 
-        Pattern p = Pattern.compile(
+        final Pattern p = Pattern.compile(
                 "\\<(-?\\d*.\\d*)#(-?\\d*.\\d*)#([a-zA-Z0-9 \\.\\,-_\\+]+)#([a-zA-Z0-9\\:\\/ ]+)\\>");
 
-        Matcher m = p.matcher(transactions);
+        final Matcher m = p.matcher(transactions);
 
         this.transactions = m.results()
                 .map(mr -> new AccountModel.Transaction(mr.group(1),
@@ -113,7 +124,7 @@ public class AccountModel {
         return this.balance.get();
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(final String balance) {
         this.balance.set(balance);
     }
 
@@ -131,7 +142,7 @@ public class AccountModel {
 
     public List<Transaction> getTransactions() {
 
-        List<Transaction> reversedTransactionList = new ArrayList<>();
+        final List<Transaction> reversedTransactionList = new ArrayList<>();
         this.transactions.stream()
                 .forEach(transaction -> reversedTransactionList.add(0,
                         transaction));
@@ -144,12 +155,12 @@ public class AccountModel {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        AccountModel accountModel = (AccountModel) obj;
+        final AccountModel accountModel = (AccountModel) obj;
         return Objects.equals(this.name, accountModel.name);
     }
 
