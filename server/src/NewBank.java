@@ -79,7 +79,7 @@ public class NewBank {
             return Move(customer, param1, param2, param3);
 
         case "PAY":
-            return pay(customer, param1, param2);
+            return pay(customer, param1, param2, param3);
 
         case "CHANGEPASSWORD":
             return changePassword(customer, param1, param2);
@@ -92,6 +92,9 @@ public class NewBank {
 
         case "LISTACCOUNTS":
             return listAccounts(customer);
+
+        case "WITHDRAW":
+            return Withdraw(customer, param1, param2);
 
         default:
             printTrace(customer, "Invalid input");
@@ -133,7 +136,8 @@ public class NewBank {
         s += "// ADDACCOUNT <Account Name> : to create new account \n";
         s += "// DEPOSIT <Account Name> <Amount> : deposit money\n";
         s += "// MOVE <Amount> <From Account> <To Account> : to move money\n";
-        s += "// PAY <UserID> <Amount> : to transfer money\n";
+        s += "// PAY <Amount> <From Account> <To User> : to pay money\n";
+        s += "// WITHDRAW <Account Name> <Amount> : Withdraw money\n";
         s += "// CHANGEPASSWORD <Old Password> <New Password> : change password\n";
         s += "// ADDUSER <UserID> <Password> : create user (only admin)\n";
         s += "// LISTUSERS : list users (only admin)\n";
@@ -220,11 +224,11 @@ public class NewBank {
 
         if (customer.hasAccountByName(accountName)
                 && customer.hasAccountByName(accountName1)
-                && amount < account.getBalance(accountName)) {
+                && amount <= account.getBalance()) {
 
             // The transaction
-            account.newTransaction(-amount, "amount moved");
-            account1.newTransaction(+amount, "amount added from other account");
+            account.newTransaction(-amount, "Amount moved");
+            account1.newTransaction(+amount, "Amount added from other account");
 
             BankCosmosDb.replaceAccountDocument(account);
             BankCosmosDb.replaceAccountDocument(account1);
@@ -240,8 +244,7 @@ public class NewBank {
      * Pay another client (From main account to a main account)
      * 
      */
-    private String pay(Customer customer, String userName,
-            String amountString) {
+    private String pay(Customer customer, String amountString, String accountName, String userName) {
 
         Double amount = 0.0;
 
@@ -251,20 +254,23 @@ public class NewBank {
             return NewBank.FAIL;
         }
 
-        Account Mainclient = customer.getMainAccount();
+        Account account = customer.getAccountByName(accountName);
         Customer client = customer.getReciverName(userName);
 
-        if (amount < Mainclient.getMainBalance(Mainclient) && client != null) {
-
+        if (customer.theirIsReciver(userName) && customer.hasAccount() && amount <= account.getBalance() && customer.hasAccountByName(accountName)) {
+            
+            Account clientAccount = client.getFirstAccount();
             // The transaction itself
-            Mainclient.newTransaction(-amount, "Payed");
+            account.newTransaction(-amount, "Paid to " + userName);
+            clientAccount.newTransaction(+amount, "Transfer Received from " + customer.getUserName());
 
-            BankCosmosDb.replaceAccountDocument(Mainclient);
+            BankCosmosDb.replaceAccountDocument(account);
+            BankCosmosDb.replaceAccountDocument(clientAccount);
 
             return NewBank.SUCCESS;
 
         } else {
-            printTrace(customer, "Issue with the payment");
+            printTrace(customer, "Issue with payment");
             return NewBank.FAIL;
         }
     }
@@ -354,6 +360,37 @@ public class NewBank {
             return NewBank.FAIL;
         }
     }
+
+        /*
+     * Withdraw money from an account
+     * 
+     */
+    private String Withdraw(Customer customer, String accountName,
+            String amountString) {
+
+        Double amount = 0.0;
+        try {
+            amount = Double.parseDouble(amountString);
+        } catch (Exception e) {
+            return NewBank.FAIL;
+        }
+
+        Account account = customer.getAccountByName(accountName);
+        
+        if (customer.hasAccountByName(accountName) && amount <= account.getBalance()) {
+
+            // The transaction itself
+            account.newTransaction(-amount, "Withdraw");
+
+            BankCosmosDb.replaceAccountDocument(account);
+            return NewBank.SUCCESS;
+
+        } else {
+            printTrace(customer, "Issue with the Wirthdraw");
+            return NewBank.FAIL;
+        }
+    }
+
 
     /*
      * Auxiliary trace method to print in the console to correct errors
