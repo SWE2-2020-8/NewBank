@@ -185,6 +185,14 @@ public class Customer {
     }
 
     /*
+     * so the non-admins can see userlist
+     */
+    public String toStringNoPassword() {
+
+        return "<" + this.userName + "#passwordHasBeenRedacted>";
+    }
+
+    /*
      * Returns the accounts in string format
      */
     public String accountsToString() {

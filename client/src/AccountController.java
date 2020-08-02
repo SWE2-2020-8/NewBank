@@ -387,9 +387,9 @@ public class AccountController implements Initializable {
                 if (toUser.isPresent() && BankClient.pay(amount,
                         activeAccount.getName(), toUser.get())) {
                     populateAccounts();
-                    showMessage("You have transferred " + amount
-                            + " between account " + activeAccount.getName()
-                            + " and user " + toUser);
+                    showMessage("You have paid " + amount + " to the user "
+                            + toUser.get() + " from the account "
+                            + activeAccount.getName());
                 } else
                     showError("");
             } else
@@ -584,17 +584,21 @@ public class AccountController implements Initializable {
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
 
-                    // Keep active account object
-                    activeAccount = newValue;
+                    // Do not trigger when resetting the list
+                    if (Objects.nonNull(newValue)) {
 
-                    // Update account name and balance
-                    detailName.setText(newValue.getName());
-                    detailBalance.setText(newValue.getBalance());
+                        // Store active account object
+                        activeAccount = newValue;
 
-                    // Update transaction list
-                    transactionList.clear();
-                    transactionList.addAll(newValue.getTransactions());
-                    transactionTable.setItems(transactionList);
+                        // Update account name and balance
+                        detailName.setText(newValue.getName());
+                        detailBalance.setText(newValue.getBalance());
+
+                        // Update transaction list
+                        transactionList.clear();
+                        transactionList.addAll(newValue.getTransactions());
+                        transactionTable.setItems(transactionList);
+                    }
                 });
 
         // Set the username in the scene

@@ -37,8 +37,8 @@
                         <Font size="24.0" />
                     </font>
                 </Text>
-                <Text layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to your  personal safe  cloud banking service" wrappingWidth="118.51953125" />
-            <Text layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your NewBank username and password to log in" wrappingWidth="116.337890625" />
+                <Text layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to your personal safe cloud banking service" wrappingWidth="118.51953125" />
+            <Text layoutY="267.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your username and password below" wrappingWidth="100.0" />
                 <TextField fx:id="textField" layoutY="310.0" prefHeight="27.0" prefWidth="120.0" promptText="Username" />
                 <PasswordField fx:id="passwordField" layoutY="337.0" onAction="#passwordAction" prefHeight="27.0" prefWidth="120.0" promptText="Password" />
                 <Label fx:id="label" layoutY="377.0" minHeight="16" minWidth="120.0" />

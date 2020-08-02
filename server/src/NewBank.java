@@ -142,7 +142,7 @@ public class NewBank {
         s += "// WITHDRAW <Account Name> <Amount> : to withdraw money\n";
         s += "// CHANGEPASSWORD <Old Password> <New Password> : to change password\n";
         s += "// ADDUSER <UserID> <Password> : to create user (only admin)\n";
-        s += "// LISTUSERS : to list all users (only admin)\n";
+        s += "// LISTUSERS : to list all users (only admin can see passwords)\n";
         s += "// LISTACCOUNTS : to list all accounts (only admin)\n";
         return s + NewBank.SUCCESS;
     }
@@ -353,14 +353,17 @@ public class NewBank {
     }
 
     /*
-     * List all users (only Admin)
+     * List all users
+     * 
+     * (only Admin in client, but allowing the rest of the users to see the
+     * usernames so that they can see a transfer list)
      * 
      */
     private String listUsers(final Customer customer) {
 
         if (customer.getUserName().equals(ADMIN)) {
 
-            printTrace(customer, "Users listed");
+            printTrace(customer, "Users listed with passwords");
             return Customer.getAllCustomersList()
                     .stream()
                     .map(Customer::toString)
@@ -368,8 +371,13 @@ public class NewBank {
                     + NewBank.SUCCESS;
 
         } else {
-            printTrace(customer, "Users not listed");
-            return NewBank.FAIL;
+
+            printTrace(customer, "Users listed without password");
+            return Customer.getAllCustomersList()
+                    .stream()
+                    .map(Customer::toStringNoPassword)
+                    .collect(Collectors.joining("\n", "", "\n"))
+                    + NewBank.SUCCESS;
         }
     }
 
