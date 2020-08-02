@@ -18,28 +18,28 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # checkout the repo
       - name: "Checkout GitHub Action"
         uses: actions/checkout@v2
 
-      - name: "Login via Azure CLI"
+      - name: "Login to Azure"
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Build and push image"
+      - name: "Set up Docker to push to Azure Repository"
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - run: |
+      - name: "Build the NewBank Server Application JAR, create a NewBank Server Image and push Azure Repository"
+        run: |
           cd server
           docker build --build-arg db_master_key=${{ secrets.DB_MASTER_KEY }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }} .
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/bankserver:${{ github.sha }}
 
-      - name: "Deploy to Azure Container Instances"
+      - name: "Deploy NewBank Server Image to Azure Container Instances"
         uses: "azure/aci-deploy@v1"
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
@@ -49,8 +49,4 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: bankserver
-          #azure-file-volume-share-name: ${{ secrets.AZ_STORAGE_SHARE_NAME }}
-          #azure-file-volume-account-name: ${{ secrets.AZ_STORAGE_ACCOUNT_NAME }}
-          #azure-file-volume-account-key: ${{ secrets.AZ_STORAGE_ACCOUNT_KEY }}
-          #azure-file-volume-mount-path: /mnt/volume
           location: "southeastasia"

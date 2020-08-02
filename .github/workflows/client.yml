@@ -22,7 +22,8 @@ jobs:
       - name: "Checkout GitHub Action"
         uses: actions/checkout@v2
 
-      - run: |
+      - name: "Build the JavaFX Client Application JAR"
+        run: |
           cd client
           docker build -t gabrielbcn/newbankclient:1.0 .
           docker create -it --name temp gabrielbcn/newbankclient:1.0 sh
@@ -31,6 +32,7 @@ jobs:
           pwd
           ls -l
 
-      - uses: actions/upload-artifact@v2
+      - name: "Upload the JavaFX Client Application JAR as artifact in GitHub Action"
+        uses: actions/upload-artifact@v2
         with:
           path: /home/runner/work/NewBank/NewBank/client/newbankclient.jar
