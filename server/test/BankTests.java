@@ -9,7 +9,6 @@ import com.azure.cosmos.models.CosmosContainerProperties;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class BankTests {
