@@ -432,7 +432,7 @@ public class AccountController implements Initializable {
                     populateAccounts();
                     showMessage("You have transferred " + amount
                             + " between account " + activeAccount.getName()
-                            + " and account " + toAccount);
+                            + " and account " + toAccount.get());
                 } else
                     showError("");
             } else
