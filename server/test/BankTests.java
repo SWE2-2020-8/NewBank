@@ -36,26 +36,6 @@ public class BankTests {
         assertTrue(retrieved.size() > 0);
     }
 
-    @Ignore("Only used to reset the user database, do not use!")
-    @Test
-    public void resetBankCustomers() {
-
-        BankCosmosDb.deleteDatabase();
-        BankCosmosDb.retrieveOrCreateDatabase();
-        BankCosmosDb.retrieveOrCreateContainerIdentity();
-        BankCosmosDb.retrieveOrCreateContainerAccounts();
-
-        BankCosmosDb.createCustomerDocument(new Customer("Admin", "1234"));
-        BankCosmosDb.createCustomerDocument(new Customer("Bhagy", "hi"));
-        BankCosmosDb.createCustomerDocument(new Customer("Christina", "lol"));
-        BankCosmosDb.createCustomerDocument(new Customer("John", "nhoj"));
-
-        assertTrue(Customer.isCustomer("Admin"));
-        assertTrue(Customer.isCustomer("Bhagy"));
-        assertTrue(Customer.isCustomer("Christina"));
-        assertTrue(Customer.isCustomer("John"));
-    }
-
     @Test
     public void containersExistTest() {
 

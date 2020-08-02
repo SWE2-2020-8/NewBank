@@ -15,7 +15,6 @@ public class Customer {
     private String password;
     private ArrayList<Account> accounts;
 
-
     /*
      * Constructor for a Customer object
      * 
@@ -36,14 +35,15 @@ public class Customer {
     public Account addAccount(String accountName, double openingBalance) {
 
         Account newAccount = new Account(this.getUserName(), accountName);
-        newAccount.addTransaction(new Account.Transaction(openingBalance, openingBalance, "Account opening"));
+        newAccount.addTransaction(new Account.Transaction(openingBalance,
+                openingBalance, "Account opening"));
 
         this.accounts.add(newAccount);
         return newAccount;
     }
 
     /*
-     * Static method the full customer list
+     * Static method to get the full customer list
      * 
      */
     public static List<Customer> getAllCustomersList() {
@@ -57,8 +57,7 @@ public class Customer {
      */
     public static boolean isCustomer(String userName) {
 
-        return Customer.allCustomers
-                .stream()
+        return Customer.allCustomers.stream()
                 .anyMatch(customer -> customer.userName.equals(userName));
     }
 
@@ -68,18 +67,10 @@ public class Customer {
      */
     public static Customer getCustomerByName(String userName) {
 
-        return Customer.allCustomers
-                .stream().filter(customer -> customer.userName.equals(userName))
+        return Customer.allCustomers.stream()
+                .filter(customer -> customer.userName.equals(userName))
                 .findAny()
                 .orElse(null);
-    }
-
-      /*
-     * Check if the bank has customer by that name 
-     * 
-     */
-    public boolean HaveCustomerByName(String userName) {
-        return Objects.nonNull(this.getCustomerByName(userName));
     }
 
     /*
@@ -115,7 +106,6 @@ public class Customer {
         return this.accounts;
     }
 
-
     /*
      * Get account stream from the user
      * 
@@ -141,7 +131,8 @@ public class Customer {
     public Account getAccountByName(String accountName) {
 
         return this.getAccounts()
-                .stream().filter(account -> account.getAccountName().equals(accountName))
+                .stream()
+                .filter(account -> account.getAccountName().equals(accountName))
                 .findFirst()
                 .orElse(null);
     }
@@ -170,6 +161,21 @@ public class Customer {
     }
 
     /*
+     * Returns first account for client
+     */
+    public Account getFirstAccount() {
+        return this.getAccounts().stream().findFirst().orElse(null);
+    }
+
+    /*
+     * Check if the user has an account
+     * 
+     */
+    public boolean hasAccount() {
+        return Objects.nonNull(this.getFirstAccount());
+    }
+
+    /*
      * toString()
      */
     @Override
@@ -189,40 +195,5 @@ public class Customer {
             s.append(a.toString() + "\n");
         return s.toString();
     }
-
-      /*
-     * Returns the username of client reciving amount
-     */
-    public Customer getReciverName(String userName) {
-        return getCustomerByName(userName);
-        
-    }
-
-    /*
-     * Check if the thier is a customer by that name
-     * 
-     */
-    public boolean theirIsReciver(String userName) {
-        return Objects.nonNull(this.getReciverName(userName));
-    }
-
-     /*
-     * Returns first account for client
-     */
-    public Account getFirstAccount() {
-        return this.getAccounts()
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
-
-     /*
-     * Check if the user has an account 
-     * 
-     */
-    public boolean hasAccount() {
-        return Objects.nonNull(this.getFirstAccount());
-    }
-
 
 }
