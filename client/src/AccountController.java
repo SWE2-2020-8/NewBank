@@ -114,11 +114,13 @@ public class AccountController implements Initializable {
         final ButtonType listUsersButtonType = new ButtonType("List Users",
                 ButtonData.OTHER);
         final ButtonType listAccountsType = new ButtonType("List Accounts",
+				ButtonData.OTHER);
+		final ButtonType payInterestType = new ButtonType("Pay Interest",
                 ButtonData.OTHER);
         dialog.getDialogPane()
                 .getButtonTypes()
                 .addAll(changePasswordButtonType, addUserButtonType,
-                        listUsersButtonType, listAccountsType,
+                        listUsersButtonType, listAccountsType, payInterestType,
                         ButtonType.CLOSE);
 
         // Do the proper thing depending on button clicked
@@ -130,7 +132,9 @@ public class AccountController implements Initializable {
             else if (dialogButton == listUsersButtonType)
                 listUsers();
             else if (dialogButton == listAccountsType)
-                listAccounts();
+				listAccounts();
+			else if (dialogButton == payInterestType)
+				payInterest();
             return null;
         });
         dialog.showAndWait();
@@ -321,6 +325,29 @@ public class AccountController implements Initializable {
 
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();
+	}
+	
+
+	private void payInterest() {
+		// Create the custom dialog
+        final TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Pay interest to all NewBank users");
+        dialog.setHeaderText(
+                "Admin reserved function: Pay interest to all NewBank users");
+        dialog.setContentText(
+                "To pay interest to all NewBank users, you must set an interest rate");
+
+		final String amount = dialog.showAndWait().orElse("");
+
+		if (!isPositiveNumber(amount))
+			showError(ILLEGAL_AMOUNT_MSG);
+		else if (BankClient.payInterest(activeAccount.getName(), amount)) {
+			populateAccounts();
+			showMessage("You have now paid interest to all NewBank users at a rate of " + amount
+					+ " from "
+					+ activeAccount.getName() + ". Thanks!");
+		} else
+			showError("");
     }
 
     // Withdrawing money
@@ -466,7 +493,7 @@ public class AccountController implements Initializable {
             } else
                 showError("");
         }
-    }
+	}
 
     // Checking if number is positive
     private static boolean isPositiveNumber(final String strNum) {

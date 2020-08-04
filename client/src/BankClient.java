@@ -176,7 +176,15 @@ public class BankClient {
 
         bankOut.println("ADDACCOUNT " + accountname);
         return parseServerOutcome();
-    }
+	}
+	
+	// Pay interest to all NewBank accounts except admin
+	public static boolean payInterest(final String accountname, 
+			final String amount) {
+
+		bankOut.println("PAYINTEREST " + accountname + " " + amount);
+		return parseServerOutcome();
+	}
 
     // Depositing money
     public static boolean deposit(final String accountname,
