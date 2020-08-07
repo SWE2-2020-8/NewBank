@@ -334,17 +334,22 @@ public class NewBank {
                     .flatMap(cust -> cust.getAccounts().stream())
                     .forEach(receiverAccount -> {
 
-                        Double amount = rate / 100
-                                * receiverAccount.getBalance();
-                        senderAccount.newTransaction(-amount,
-                                "Interest payment to customer "
-                                        + customer.getUserName() + " account "
-                                        + receiverAccount.getAccountName());
-                        receiverAccount.newTransaction(+amount,
-                                "Interest payment " + interestRate + "%");
+                        Double amount = Math.rint(
+                                rate * receiverAccount.getBalance()) / 100;
 
-                        BankCosmosDb.replaceAccountDocument(senderAccount);
-                        BankCosmosDb.replaceAccountDocument(receiverAccount);
+                        if (amount > 0) {
+                            senderAccount.newTransaction(-amount,
+                                    "Interest payment to "
+                                            + customer.getUserName()
+                                            + " account "
+                                            + receiverAccount.getAccountName());
+                            receiverAccount.newTransaction(+amount,
+                                    "Interest payment " + interestRate + "%");
+
+                            BankCosmosDb.replaceAccountDocument(senderAccount);
+                            BankCosmosDb
+                                    .replaceAccountDocument(receiverAccount);
+                        }
                     });
 
             printTrace(customer, "Paid interest to clients");

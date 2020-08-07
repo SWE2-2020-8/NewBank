@@ -41,7 +41,7 @@
             <Text layoutY="267.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your username and password below" wrappingWidth="100.0" />
                 <TextField fx:id="textField" layoutY="310.0" prefHeight="27.0" prefWidth="120.0" promptText="Username" />
                 <PasswordField fx:id="passwordField" layoutY="337.0" onAction="#passwordAction" prefHeight="27.0" prefWidth="120.0" promptText="Password" />
-                <Label fx:id="label" layoutY="377.0" minHeight="16" minWidth="120.0" />
+                <Label fx:id="label" layoutY="397.0" minHeight="16" minWidth="120.0" prefHeight="24.0" prefWidth="120.0" />
             </children>
         </Pane>
     </right>
