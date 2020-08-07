@@ -40,10 +40,15 @@ public class LoginController implements Initializable {
     @FXML
     private void handleButtonAction(final ActionEvent event) {
 
+        // Make the connection with the bank server
+        BankClient.connect("swe2-2020-8.southeastasia.azurecontainer.io", 80);
+
+        // Login attempt
         final boolean success = BankClient.bankLogin(textField.getText(),
                 passwordField.getText());
         label.setText(success ? "Connected" : "Login failed, try again");
 
+        // If successful go to new Stage
         if (success) {
             Parent root;
             try {
@@ -70,9 +75,6 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
-
-        // Make the connection with the bank server
-        BankClient.connect("swe2-2020-8.southeastasia.azurecontainer.io", 80);
 
         // Request focus on the username field by default
         Platform.runLater(() -> textField.requestFocus());

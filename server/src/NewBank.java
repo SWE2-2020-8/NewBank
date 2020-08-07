@@ -340,7 +340,7 @@ public class NewBank {
                         if (amount > 0) {
                             senderAccount.newTransaction(-amount,
                                     "Interest payment to "
-                                            + customer.getUserName()
+                                            + receiverAccount.getUserName()
                                             + " account "
                                             + receiverAccount.getAccountName());
                             receiverAccount.newTransaction(+amount,
