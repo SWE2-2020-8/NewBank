@@ -98,7 +98,7 @@ public class AccountModel {
         this.balance.set(balance);
 
         final Pattern p = Pattern.compile(
-                "\\<(-?\\d*.\\d*)#(-?\\d*.\\d*)#([a-zA-Z0-9 \\.\\,-_\\+]+)#([a-zA-Z0-9\\:\\/ ]+)\\>");
+                "\\<(-?\\d*.\\d*)#(-?\\d*.\\d*)#([a-zA-Z0-9\\% \\.\\,-_\\+]+)#([a-zA-Z0-9\\:\\/ ]+)\\>");
 
         final Matcher m = p.matcher(transactions);
 
