@@ -8,7 +8,8 @@
 ### To jump quickly to...
 - [Wiki](https://github.com/SWE2-2020-8/NewBank/wiki), for this document and others
 - [Backlog, sprint backlog and weekly reports](https://github.com/SWE2-2020-8/NewBank/wiki/NewBank-backlog-and-sprints-page)
-- [User Stories and Requirements](https://github.com/SWE2-2020-8/NewBank/wiki/User-Stories-and-Requirements) 
+- [User Stories and Requirements](https://github.com/SWE2-2020-8/NewBank/wiki/User-Stories-and-Requirements)
+- [Slack channel](https://join.slack.com/t/swe2-2020-8/shared_invite/zt-gj3iswzo-inC7jb3iaSAyQ1pEPR3jYQ) for discussions 
 - [Main board](https://github.com/orgs/SWE2-2020-8/projects/1), kanban board for management activities
 - [NewBank code board](https://github.com/SWE2-2020-8/NewBank/projects/1), kanban board for code works
 - [The code repository](https://github.com/SWE2-2020-8/NewBank)
