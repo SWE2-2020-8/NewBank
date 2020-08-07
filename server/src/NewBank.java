@@ -1,4 +1,3 @@
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -148,7 +147,7 @@ public class NewBank {
         s += "// ADDUSER <UserID> <Password> : to create user (only admin)\n";
         s += "// LISTUSERS : to list all users (only admin can see passwords)\n";
         s += "// LISTACCOUNTS : to list all accounts (only admin)\n";
-        s += "// PAYINTEREST : <Interest> <Account Name> to pay interest to all accounts under the client name (only admin)\n";
+        s += "// PAYINTEREST <Account Name> <Interest> : to pay interest to all accounts (only admin)\n";
         return s + NewBank.SUCCESS;
     }
 
@@ -313,43 +312,48 @@ public class NewBank {
         }
     }
 
-     /*
+    /*
      * Pay Interest to clients (only Admin)
      * 
      * (From selected account to first account)
      * 
      */
-    private String payInterest(final Customer customer, final String interest, final String AccountName) {
+    private String payInterest(final Customer customer,
+            final String accountName, final String interestRate) {
 
-        if (customer.getUserName().equals(ADMIN)) {
-            final Account senderAccount = customer.getAccountByName(AccountName);
-            final List<Customer> customers = Customer.getAllCustomersList();
-            customers.removeIf(user-> user.getUserName().equals(ADMIN));
-            for (int i = 0; i < customers.size(); i++) {
-                Customer client = customers.get(i);     
-                List<Account> receiverAccounts = client.getAccounts();
-                for (int x = 0; x < receiverAccounts.size(); x++) {
-                    Account receiverAccount = receiverAccounts.get(x);
-                    Double rate = toNumber(interest);
-                    Double amount = rate / 100 * receiverAccount.getBalance();
-                    senderAccount.newTransaction(-amount, "Interest payment to customers");
-                    receiverAccount.newTransaction(+amount, "Interest payment" + customer.getUserName());
+        if (customer.getUserName().equals(ADMIN) && isValidNumber(interestRate)
+                && customer.hasAccountByName(accountName)) {
 
-                    BankCosmosDb.replaceAccountDocument(senderAccount);
-                    BankCosmosDb.replaceAccountDocument(receiverAccount);
+            final Account senderAccount = customer
+                    .getAccountByName(accountName);
+            Double rate = toNumber(interestRate);
 
-                }
-        }
+            Customer.getAllCustomersList()
+                    .stream()
+                    .filter(cust -> !cust.getUserName().equals(ADMIN))
+                    .flatMap(cust -> cust.getAccounts().stream())
+                    .forEach(receiverAccount -> {
+
+                        Double amount = rate / 100
+                                * receiverAccount.getBalance();
+                        senderAccount.newTransaction(-amount,
+                                "Interest payment to customer "
+                                        + customer.getUserName() + " account "
+                                        + receiverAccount.getAccountName());
+                        receiverAccount.newTransaction(+amount,
+                                "Interest payment " + interestRate + "%");
+
+                        BankCosmosDb.replaceAccountDocument(senderAccount);
+                        BankCosmosDb.replaceAccountDocument(receiverAccount);
+                    });
+
             printTrace(customer, "Paid interest to clients");
-         return NewBank.SUCCESS;
-
+            return NewBank.SUCCESS;
         } else {
             printTrace(customer, "Issue with interest payment");
-            return NewBank.FAIL; 
+            return NewBank.FAIL;
         }
     }
-
-
 
     /*
      * Change user's password
