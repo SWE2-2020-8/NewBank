@@ -24,7 +24,7 @@ public class EntryPoint extends Application {
         final Scene scene = new Scene(root);
         scene.getStylesheets().add("styles/Styles.css");
 
-        stage.setTitle("NewBank Client");
+        stage.setTitle("NewBank Client Login");
         stage.setScene(scene);
         stage.show();
     }

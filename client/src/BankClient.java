@@ -35,7 +35,7 @@ public class BankClient {
     private static final String IS_SUCCESS = "^SUCCESS";
     private static final String IS_COMMENT = "^//.*";
     private static final String REGEX_USER = "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)\\>$";
-    private static final String REGEX_ACCOUNT = "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?\\d*.\\d*)#\\[(.*)\\]\\>$";
+    private static final String REGEX_ACCOUNT = "^\\<([a-zA-Z0-9]+)#([a-zA-Z0-9]+)#(-?[\\d\\,]*.\\d*)#\\[(.*)\\]\\>$";
 
     // To check server output
     private static Predicate<String> isSuccess = line -> line
@@ -176,15 +176,15 @@ public class BankClient {
 
         bankOut.println("ADDACCOUNT " + accountname);
         return parseServerOutcome();
-	}
-	
-	// Pay interest to all NewBank accounts except admin
-	public static boolean payInterest(final String accountname, 
-			final String amount) {
+    }
 
-		bankOut.println("PAYINTEREST " + accountname + " " + amount);
-		return parseServerOutcome();
-	}
+    // Pay interest to all NewBank accounts except admin
+    public static boolean payInterest(final String accountname,
+            final String amount) {
+
+        bankOut.println("PAYINTEREST " + accountname + " " + amount);
+        return parseServerOutcome();
+    }
 
     // Depositing money
     public static boolean deposit(final String accountname,

@@ -17,11 +17,11 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AccountController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AccountController">
     <children>
         <SplitPane dividerPositions="0.25903614457831325" orientation="VERTICAL" prefHeight="500.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <items>
-                <SplitPane dividerPositions="0.22909698996655517" prefHeight="232.0" prefWidth="598.0">
+                <SplitPane dividerPositions="0.21786833855799373" prefHeight="232.0" prefWidth="598.0">
                     <items>
                         <ListView fx:id="listViewAccounts" prefHeight="230.0" prefWidth="133.0" />
                         <GridPane hgap="5.0" prefHeight="230.0" prefWidth="455.0" vgap="5.0">
@@ -84,14 +84,15 @@
                                 <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
                                 <ButtonBar buttonOrder="" nodeOrientation="RIGHT_TO_LEFT" prefHeight="51.0" prefWidth="455.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" GridPane.rowSpan="2147483647">
                                     <buttons>
+                              <Button fx:id="buttonLogout" mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
                                         <Button fx:id="buttonWithdraw" mnemonicParsing="false" onAction="#handleWithdraw" text="Withdraw" />
                                         <Button fx:id="buttonTransfer" mnemonicParsing="false" onAction="#handleTransfer" text="Transfer" />
                                         <Button fx:id="buttonMove" mnemonicParsing="false" onAction="#handleMove" text="Move" />
                                         <Button fx:id="buttonDeposit" mnemonicParsing="false" onAction="#handleDeposit" text="Deposit" />
-                                        <Button fx:id="buttonAccount" mnemonicParsing="false" onAction="#handleAccount" text="+Account" />
+                                        <Button fx:id="buttonAccount" mnemonicParsing="false" onAction="#handleAccount" text="NewAcc." />
                                     </buttons>
                                     <GridPane.margin>
-                                        <Insets left="3.0" right="10.0" />
+                                        <Insets />
                                     </GridPane.margin>
                                 </ButtonBar>
                                 <Separator prefHeight="0.0" prefWidth="447.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
@@ -105,8 +106,8 @@
                 <TableView fx:id="transactionTable" prefHeight="158.0" prefWidth="598.0">
                     <columns>
                         <TableColumn fx:id="dateColumn" prefWidth="139.0" text="Date" />
-                        <TableColumn fx:id="amountColumn" minWidth="8.0" prefWidth="75.0" text="Amount" />
-                        <TableColumn fx:id="balanceColumn" prefWidth="75.0" text="Balance" />
+                        <TableColumn fx:id="amountColumn" minWidth="8.0" prefWidth="95.0" text="Amount" />
+                        <TableColumn fx:id="balanceColumn" prefWidth="95.0" text="Balance" />
                         <TableColumn fx:id="descriptionColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="290.0" text="Description" />
                     </columns>
                 </TableView>

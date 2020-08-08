@@ -32,8 +32,8 @@ public class Account {
         public String toString() {
 
             // Formatting doubles properly
-            String strAmount = String.format("%.2f", this.amount);
-            String strBalance = String.format("%.2f", this.balance);
+            String strAmount = String.format("%,.2f", this.amount);
+            String strBalance = String.format("%,.2f", this.balance);
 
             return "<" + strAmount + "#" + strBalance + "#" + this.description
                     + "#" + this.date + ">";
@@ -141,7 +141,7 @@ public class Account {
     public String toString() {
 
         // Formatting the balance properly
-        String strBalance = String.format("%.2f", this.balance);
+        String strBalance = String.format("%,.2f", this.balance);
 
         return "<" + this.userName + "#" + this.accountName + "#" + strBalance
                 + "#" + this.transactions + ">";

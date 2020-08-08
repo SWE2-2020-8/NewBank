@@ -9,6 +9,7 @@
  * 
  */
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -21,8 +22,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -43,6 +48,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 
 public class AccountController implements Initializable {
@@ -114,8 +120,8 @@ public class AccountController implements Initializable {
         final ButtonType listUsersButtonType = new ButtonType("List Users",
                 ButtonData.OTHER);
         final ButtonType listAccountsType = new ButtonType("List Accounts",
-				ButtonData.OTHER);
-		final ButtonType payInterestType = new ButtonType("Pay Interest",
+                ButtonData.OTHER);
+        final ButtonType payInterestType = new ButtonType("Pay Interest",
                 ButtonData.OTHER);
         dialog.getDialogPane()
                 .getButtonTypes()
@@ -132,9 +138,9 @@ public class AccountController implements Initializable {
             else if (dialogButton == listUsersButtonType)
                 listUsers();
             else if (dialogButton == listAccountsType)
-				listAccounts();
-			else if (dialogButton == payInterestType)
-				payInterest();
+                listAccounts();
+            else if (dialogButton == payInterestType)
+                payInterest();
             return null;
         });
         dialog.showAndWait();
@@ -325,11 +331,10 @@ public class AccountController implements Initializable {
 
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();
-	}
-	
+    }
 
-	private void payInterest() {
-		// Create the custom dialog
+    private void payInterest() {
+        // Create the custom dialog
         final TextInputDialog dialog = new TextInputDialog("");
         dialog.setTitle("Pay interest to all NewBank users");
         dialog.setHeaderText(
@@ -337,17 +342,18 @@ public class AccountController implements Initializable {
         dialog.setContentText(
                 "To pay interest to all NewBank users, you must set an interest rate");
 
-		final String amount = dialog.showAndWait().orElse("");
+        final String amount = dialog.showAndWait().orElse("");
 
-		if (!isPositiveNumber(amount))
-			showError(ILLEGAL_AMOUNT_MSG);
-		else if (BankClient.payInterest(activeAccount.getName(), amount)) {
-			populateAccounts();
-			showMessage("You have now paid interest to all NewBank users at a rate of " + amount
-					+ " from "
-					+ activeAccount.getName() + ". Thanks!");
-		} else
-			showError("");
+        if (!isPositiveNumber(amount))
+            showError(ILLEGAL_AMOUNT_MSG);
+        else if (BankClient.payInterest(activeAccount.getName(), amount)) {
+            populateAccounts();
+            showMessage(
+                    "You have now paid interest to all NewBank users at a rate of "
+                            + amount + " from " + activeAccount.getName()
+                            + ". Thanks!");
+        } else
+            showError("");
     }
 
     // Withdrawing money
@@ -493,7 +499,7 @@ public class AccountController implements Initializable {
             } else
                 showError("");
         }
-	}
+    }
 
     // Checking if number is positive
     private static boolean isPositiveNumber(final String strNum) {
@@ -536,6 +542,31 @@ public class AccountController implements Initializable {
                     .clearAndSelect(accountList.indexOf(activeAccount));
         } else
             showError("");
+    }
+
+    // Creating a new account
+    @FXML
+    private void handleLogout(final ActionEvent event) {
+        try {
+
+            // Login stage and scene again
+            final Parent root = FXMLLoader
+                    .load(getClass().getResource("fxml/LoginScene.fxml"));
+
+            final Scene scene = new Scene(root);
+            scene.getStylesheets().add("styles/Styles.css");
+
+            final Stage stage = new Stage();
+            stage.setTitle("NewBank Client Login");
+            stage.setScene(scene);
+            stage.show();
+
+            // Hide this window
+            ((Node) (event.getSource())).getScene().getWindow().hide();
+
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Getting accounts from the server to populate the list
