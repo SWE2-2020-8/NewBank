@@ -121,8 +121,9 @@ public class Account {
      */
     public void newTransaction(Double amount, String description) {
 
+        // Roundings to avoid double arithmetic issues
         amount = Math.rint(amount * 100) / 100;
-        double newBalance = this.getBalance() + amount;
+        double newBalance = Math.rint((this.getBalance() + amount) * 100) / 100;
 
         this.addTransaction(
                 new Account.Transaction(+amount, newBalance, description));
