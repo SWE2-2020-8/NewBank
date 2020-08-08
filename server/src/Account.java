@@ -31,8 +31,12 @@ public class Account {
         @Override
         public String toString() {
 
-            return "<" + this.amount + "#" + this.balance + "#"
-                    + this.description + "#" + this.date + ">";
+            // Formatting doubles properly
+            String strAmount = String.format("%.2f", this.amount);
+            String strBalance = String.format("%.2f", this.balance);
+
+            return "<" + strAmount + "#" + strBalance + "#" + this.description
+                    + "#" + this.date + ">";
         }
 
         public double getAmount() {
@@ -136,7 +140,10 @@ public class Account {
     @Override
     public String toString() {
 
-        return "<" + this.userName + "#" + this.accountName + "#" + this.balance
+        // Formatting the balance properly
+        String strBalance = String.format("%.2f", this.balance);
+
+        return "<" + this.userName + "#" + this.accountName + "#" + strBalance
                 + "#" + this.transactions + ">";
     }
 
